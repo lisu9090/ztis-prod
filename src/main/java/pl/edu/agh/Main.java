@@ -11,7 +11,7 @@ public class Main {
         if(args.length == 3)
             process.setTargetParams(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]));
         else
-            process.setTargetParams(101.0, 1000.0, 80.0);
+            process.setTargetParams(90.0, 1000.0, 80.0);
         try{
            Double wjp = process.runProcess(1600.0, 2.0, 16000.0);
            System. out.println("Process sucessfull! Obtained WJP = " + wjp);

@@ -6,6 +6,7 @@
 package pl.edu.agh.productionmodel;
 
 import java.util.ArrayList;
+import java.util.List;
 import pl.edu.agh.parameter.ParamType;
 import pl.edu.agh.parameter.SizeParam;
 import pl.edu.agh.parameter.SizeType;
@@ -17,8 +18,8 @@ import pl.edu.agh.parameter.UnivParam;
  * @author Tomek
  */
 public class ProductionProcess {
-    public ArrayList<UnivParam> parameters = new ArrayList<UnivParam>();
-    public ArrayList<UnivParam> targetParams = new ArrayList<UnivParam>();
+    public List<UnivParam> parameters = new ArrayList<>();
+    public List<UnivParam> targetParams = new ArrayList<>();
     public SizeParam size;
 
     public ProductionProcess(){
