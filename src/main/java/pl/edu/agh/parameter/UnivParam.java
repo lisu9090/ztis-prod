@@ -82,7 +82,7 @@ public class UnivParam extends Parameter<Double> {
                 break;
                 case mass:
                     setMinValue(0.0);
-                    setMaxValue(1000000.0);                    
+                    setMaxValue(200000.0);                    
                 break;
                 case stiffness:
                     setMinValue(0.0);
