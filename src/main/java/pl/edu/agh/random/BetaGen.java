@@ -28,8 +28,7 @@ public class BetaGen implements IDistGenerator{
         Double offset = paramValue - (range/2);
         
         BetaDistribution bd = new BetaDistribution(alpha, beta);
-        double val = (bd.inverseCumulativeProbability(Math.random()) * range) + offset;    
-          
-        return val;    
+           
+        return (bd.inverseCumulativeProbability(Math.random()) * range) + offset;   
     } 
 }

@@ -26,8 +26,7 @@ public class GeomGen implements IDistGenerator{
         Double offset = paramValue - (range/2);
         GeometricDistribution gd = new GeometricDistribution(prob);
         
-        double val = (gd.inverseCumulativeProbability(Math.random() * range)) + offset;
-        return val;
+        return (gd.inverseCumulativeProbability(Math.random() * range)) + offset;
     }
 
 

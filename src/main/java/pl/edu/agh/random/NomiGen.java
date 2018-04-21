@@ -5,6 +5,8 @@
  */
 package pl.edu.agh.random;
 
+import java.util.Random;
+
 /**
  *
  * @author Tomek
@@ -13,7 +15,10 @@ public class NomiGen implements IDistGenerator{
 
     @Override
     public Double generate(Double paramValue, Double range) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Random rnd = new Random();
+        Double offset = paramValue - (range/2);
+        
+        return (rnd.nextDouble()* range) + offset;
     }
 
 

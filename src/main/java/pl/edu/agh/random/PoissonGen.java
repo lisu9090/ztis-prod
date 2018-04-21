@@ -6,16 +6,30 @@
 package pl.edu.agh.random;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 
 /**
  *
  * @author Tomek
  */
 public class PoissonGen implements IDistGenerator{
-
+    private Double mean;
+    
+    public PoissonGen(Double mean) {
+        this.mean = mean;
+    }
+    
     @Override
     public Double generate(Double paramValue, Double range) {
-        return 0.0;
+        if(mean > range || mean < 0)
+        {
+            System.out.println("PoissonGen: mean is out of range!");
+            return paramValue;
+        }
+        PoissonDistribution poisson = new PoissonDistribution(mean, range);
+        Double offset = paramValue - (range/2);
+        
+        return (poisson.sample() + offset);
     }
 
 
