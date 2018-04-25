@@ -18,7 +18,7 @@ public class NomiGen implements IDistGenerator{
         Random rnd = new Random();
         Double offset = paramValue - (range/2);
         
-        return (rnd.nextDouble()* range) + offset;
+        return (rnd.nextDouble() * range) + offset;
     }
 
 

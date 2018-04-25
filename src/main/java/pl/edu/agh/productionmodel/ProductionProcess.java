@@ -11,6 +11,8 @@ import pl.edu.agh.parameter.ParamType;
 import pl.edu.agh.parameter.SizeParam;
 import pl.edu.agh.parameter.SizeType;
 import pl.edu.agh.parameter.UnivParam;
+import pl.edu.agh.random.IDistGenerator;
+import pl.edu.agh.random.NomiGen;
 
 
 /**
@@ -21,8 +23,13 @@ public class ProductionProcess {
     public List<UnivParam> parameters = new ArrayList<>();
     public List<UnivParam> targetParams = new ArrayList<>();
     public SizeParam size;
+    private IDistGenerator generator;
 
     public ProductionProcess(){
+        System.out.println("Konstruktor bezparametrowy do testow. \nNalezy recznie zainicjalizowac wszystkie parametry");
+    }
+    
+    public ProductionProcess(Double targetTemp, Double targetSurf, Double targetFlex){
         parameters.add(new UnivParam(ParamType.temperature)); //0
         parameters.add(new UnivParam(ParamType.volume)); //1
         parameters.add(new UnivParam(ParamType.mass)); //2 
@@ -34,12 +41,26 @@ public class ProductionProcess {
         targetParams.add(new UnivParam(ParamType.temperature)); //0
         targetParams.add(new UnivParam(ParamType.surface)); //1
         targetParams.add(new UnivParam(ParamType.flexibility)); //2
+        targetParams.get(0).setValue(targetTemp);
+        targetParams.get(1).setValue(targetSurf);
+        targetParams.get(2).setValue(targetFlex);
+        generator = new NomiGen();
     }
     
     public void setTargetParams(Double temp, Double surf, Double flex){
         targetParams.get(0).setValue(temp);
         targetParams.get(1).setValue(surf);
         targetParams.get(2).setValue(flex);        
+    }
+    
+    public void setGenerator(IDistGenerator generator){
+        this.generator = generator;
+    }
+    
+    public void disableGenerator(){
+        for(int i=0; i<parameters.size(); i++){
+            parameters.get(i).setGeneratorRange(0.0);
+        }
     }
     
     private Double computeWJP(){
@@ -53,23 +74,34 @@ public class ProductionProcess {
     }
     
     public void firstStep(Double temp, Double vol, Double mass) throws Exception{
-        parameters.get(0).setValue(temp);
+        if(generator == null)
+            throw new Exception("Generator has not been initialized! Process hes been stopped.");           
+        
+        parameters.get(0).setValue(generator.generate(temp, parameters.get(0).getGeneratorRange()));
         if(!parameters.get(0).isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
-        parameters.get(1).setValue(vol);
+        
+        parameters.get(1).setValue(generator.generate(vol, parameters.get(1).getGeneratorRange()));
         if(!parameters.get(1).isCorrectValue())
             throw new Exception("Volume is out of range! Process hes been stopped.");
-        parameters.get(2).setValue(mass);
+        
+        parameters.get(2).setValue(generator.generate(mass , parameters.get(2).getGeneratorRange()));
         if(!parameters.get(2).isCorrectValue())
             throw new Exception("Mass is out of range! Process hes been stopped.");
         
     }
     
     public void secondStep(Double deltaTemp) throws Exception{
-        parameters.get(0).setValue(parameters.get(0).getValue() - deltaTemp);
+        if(generator == null)
+            throw new Exception("Generator has not been initialized! Process hes been stopped.");
+        
+        parameters.get(0).setValue(generator.generate((parameters.get(0).getValue() - deltaTemp), parameters.get(0).getGeneratorRange()));
         if(!parameters.get(0).isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
-        parameters.get(3).setValue(((parameters.get(2).getValue() / parameters.get(1).getValue()) / 8000.0) * (1 - (parameters.get(0).getValue() / 2000.0)));
+        
+        parameters.get(3).setValue(generator.generate(
+                ((parameters.get(2).getValue() / parameters.get(1).getValue()) / 8000.0) * (1 - (parameters.get(0).getValue() / 2000.0)),
+                parameters.get(3).getGeneratorRange()));
         if(!parameters.get(3).isCorrectValue())
             throw new Exception("Stiffness is out of range! Process hes been stopped.");
         
@@ -82,18 +114,24 @@ public class ProductionProcess {
             size.setValue(SizeType.large);
         
         parameters.get(4).setValue(Math.floor(parameters.get(1).getValue() / size.getValue()));
+        //parameters.get(4).setValue(generator.generate(Math.floor(parameters.get(1).getValue() / size.getValue()) , parameters.get(4).getGeneratorRange()));
         if(!parameters.get(4).isCorrectValue())
             throw new Exception("Amount is out of range! Process hes been stopped.");  
     }
     
     public void thirdStep() throws Exception{
-        parameters.get(0).setValue(parameters.get(0).getValue() - 300);
+        if(generator == null)
+            throw new Exception("Generator has not been initialized! Process hes been stopped.");
+        
+        parameters.get(0).setValue(generator.generate((parameters.get(0).getValue() - 300), parameters.get(0).getGeneratorRange()) );
         if(!parameters.get(0).isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
-        parameters.get(5).setValue(parameters.get(4).getValue() * (size.getValue()/0.002));
+        
+        parameters.get(5).setValue(generator.generate((parameters.get(4).getValue() * (size.getValue()/0.002)), parameters.get(5).getGeneratorRange()));
         if(!parameters.get(5).isCorrectValue())
             throw new Exception("Surface is out of range! Process hes been stopped.");
-        parameters.get(6).setValue(parameters.get(3).getValue() * parameters.get(0).getValue());
+        
+        parameters.get(6).setValue(generator.generate((parameters.get(3).getValue() * parameters.get(0).getValue()), parameters.get(6).getGeneratorRange()));
         if(!parameters.get(6).isCorrectValue())
             throw new Exception("Flexibility is out of range! Process hes been stopped.");
     }
