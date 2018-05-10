@@ -1,30 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.edu.agh.parameter;
 
-/**
- *
- * @author Tomek
- */
 public class UnivParam extends Parameter<Double> {
     private final ParamType parameterName;
     private Double minValue;
     private Double maxValue;
     private Double generatorRange; //szerokosc przedzialu generowanych danych
-    
-    //constructors
+
     public UnivParam(ParamType parameterName ){
         this.parameterName = parameterName;
-        setDefaultMinMaxValsForType();
-        this.generatorRange = new Double(0);
+        setDefaultMinMaxValuesForType();
+        this.generatorRange = 0.0d;
     }
 
     public UnivParam(ParamType parameterName, Double generatorRange ){
         this.parameterName = parameterName;
-        setDefaultMinMaxValsForType();
+        setDefaultMinMaxValuesForType();
         this.generatorRange = generatorRange;
     }
     
@@ -34,8 +24,7 @@ public class UnivParam extends Parameter<Double> {
         this.maxValue = maxValue;
         this.generatorRange = generatorRange;
     }
-    
-    //gethers
+
     @Override
     Double getMinValue() {
         return this.minValue;
@@ -50,17 +39,16 @@ public class UnivParam extends Parameter<Double> {
         return generatorRange;
     }
 
-    //setters
-    public void setMinValue(Double minValue) {
+    private void setMinValue(Double minValue) {
         if(minValue<0)
-            this.minValue = new Double(0);
+            this.minValue = 0.0d;
         else
             this.minValue = minValue;
     }
     
-    public void setMaxValue(Double maxValue) {
+     private void setMaxValue(Double maxValue) {
         if(maxValue<0)
-            this.maxValue = new Double(0);
+            this.maxValue = 0.0d;
         else
             this.maxValue = maxValue;
     }
@@ -68,9 +56,8 @@ public class UnivParam extends Parameter<Double> {
     public void setGeneratorRange(Double generatorRange) {
         this.generatorRange = generatorRange;
     }
-    
-    //domyslne parametry
-    public final void setDefaultMinMaxValsForType(){
+
+    private void setDefaultMinMaxValuesForType(){
         switch (parameterName){
             case temperature:
                     setMinValue(0.0);
@@ -104,10 +91,7 @@ public class UnivParam extends Parameter<Double> {
     }
     
     public boolean isCorrectValue(){
-        if(getValue() >= minValue && getValue() <= maxValue)
-            return true;
-        
-        return false;
+        return getValue() >= minValue && getValue() <= maxValue;
     }
     @Override
     Double getOptimalValue() {

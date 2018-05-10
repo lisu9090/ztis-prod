@@ -7,10 +7,6 @@ package pl.edu.agh.random;
 
 import java.util.Random;
 
-/**
- *
- * @author Tomek
- */
 public class NomiGen implements IDistGenerator{
 
     @Override

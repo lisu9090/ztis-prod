@@ -1,18 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.edu.agh.parameter;
 
-/**
- *
- * @author Tomek
- */
 public class SizeParam extends Parameter<Double>{
 
     public SizeParam(){
-        setValue(SizeType.small);
+        this(SizeType.small);
     }
     
     public SizeParam(SizeType size){
@@ -31,7 +22,7 @@ public class SizeParam extends Parameter<Double>{
 
     @Override
     Double getOptimalValue() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 0.2d;
     }
 
     @Override
