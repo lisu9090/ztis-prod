@@ -78,7 +78,7 @@ public class GeneratorRange {
         }
 
         public Builder flexibility(Double value) {
-            result.volumeRange = value;
+            result.flexibilityRange = value;
             return this;
         }
 
