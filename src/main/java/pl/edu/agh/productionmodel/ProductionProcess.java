@@ -1,140 +1,162 @@
 package pl.edu.agh.productionmodel;
 
-import pl.edu.agh.parameter.ParamType;
-import pl.edu.agh.parameter.SizeParam;
-import pl.edu.agh.parameter.SizeType;
-import pl.edu.agh.parameter.UnivParam;
+import pl.edu.agh.db.DBManager;
+import pl.edu.agh.parameter.*;
 import pl.edu.agh.random.IDistGenerator;
 import pl.edu.agh.random.NomiGen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductionProcess {
-    public List<UnivParam> parameters = new ArrayList<>();
-    private List<UnivParam> targetParams = new ArrayList<>();
-    private SizeParam size;
+    private Temperature temperature = new Temperature(0.0, 5000.0);
+    private Volume volume = new Volume(0.5, 20.0);
+    private Mass mass = new Mass(0.0, 200000.0);
+    private Stiffness stiffness = new Stiffness(0.0, 10.0);
+    private Amount amount = new Amount(0.0, 10000.0);
+    private Surface surface = new Surface(0.0, 1000000.0);
+    private Flexibility flexibility = new Flexibility(0.0, 1000000.0);
+
+    private Temperature outputTemperature = new Temperature(0.0, 5000.0);
+    private Surface outputSurface = new Surface(0.0, 1000000.0);
+    private Flexibility outputFlexibility = new Flexibility(0.0, 1000000.0);
+
+    private Double size;
+    private GeneratorRange generatorRange = new GeneratorRange.Builder().build();
+
+    private List<ParameterJson> parameters = new ArrayList<>();
     private IDistGenerator generator;
+    private Long pid;
+
+    private ProductionProcess() {
+        pid = System.currentTimeMillis();
+        DBManager.getINSTANCE().saveProcess(new ProcessJson(pid));
+    }
 
     public ProductionProcess(Double targetTemp, Double targetSurf, Double targetFlex) {
-        parameters.add(new UnivParam(ParamType.temperature)); //0
-        parameters.add(new UnivParam(ParamType.volume)); //1
-        parameters.add(new UnivParam(ParamType.mass)); //2 
-        parameters.add(new UnivParam(ParamType.stiffness)); //3
-        parameters.add(new UnivParam(ParamType.amount)); //4
-        parameters.add(new UnivParam(ParamType.surface)); //5
-        parameters.add(new UnivParam(ParamType.flexibility)); //6        
-        size = new SizeParam();
-        targetParams.add(new UnivParam(ParamType.temperature)); //0
-        targetParams.add(new UnivParam(ParamType.surface)); //1
-        targetParams.add(new UnivParam(ParamType.flexibility)); //2
-        targetParams.get(0).setValue(targetTemp);
-        targetParams.get(1).setValue(targetSurf);
-        targetParams.get(2).setValue(targetFlex);
+        this();
+        outputTemperature.setValue(targetTemp);
+        outputSurface.setValue(targetSurf);
+        outputFlexibility.setValue(targetFlex);
         generator = new NomiGen();
     }
 
     public void setTargetParams(Double temp, Double surf, Double flex) {
-        targetParams.get(0).setValue(temp);
-        targetParams.get(1).setValue(surf);
-        targetParams.get(2).setValue(flex);
+        outputTemperature.setValue(temp);
+        outputSurface.setValue(surf);
+        outputFlexibility.setValue(flex);
+    }
+
+    public void setGeneratorRange(GeneratorRange generatorRange) {
+        this.generatorRange = generatorRange;
     }
 
     public void setGenerator(IDistGenerator generator) {
         this.generator = generator;
     }
 
-    public void disableGenerator() {
-        parameters.forEach(it -> it.setGeneratorRange(0.0));
-    }
-
     private Double computeWJP() {
-        if (parameters.get(0).getValue() <= targetParams.get(0).getValue()) {
-            return (Math.abs(targetParams.get(1).getValue() - parameters.get(5).getValue())
-                    + Math.abs(targetParams.get(2).getValue() - parameters.get(6).getValue())) * parameters.get(4).getValue();
+        if (temperature.getValue() <= outputTemperature.getValue()) {
+            return (Math.abs(outputSurface.getValue() - surface.getValue())
+                    + Math.abs(outputFlexibility.getValue() - flexibility.getValue())) * amount.getValue();
         }
 
-        return (Math.abs(targetParams.get(0).getValue() - parameters.get(0).getValue()) + Math.abs(targetParams.get(1).getValue() - parameters.get(5).getValue())
-                + Math.abs(targetParams.get(2).getValue() - parameters.get(6).getValue())) * parameters.get(4).getValue();
+        return (Math.abs(outputTemperature.getValue() - temperature.getValue()) + Math.abs(outputSurface.getValue() - surface.getValue())
+                + Math.abs(outputFlexibility.getValue() - flexibility.getValue())) * amount.getValue();
     }
 
     private void firstStep(Double temp, Double vol, Double mass) throws Exception {
+        saveCurrentStage(1);
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
-        parameters.get(0).setValue(generator.generate(temp, parameters.get(0).getGeneratorRange()));
-        if (!parameters.get(0).isCorrectValue())
+        temperature.setValue(generator.generate(temp, generatorRange.getTemperatureRange()));
+        if (!temperature.isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
 
-        parameters.get(1).setValue(generator.generate(vol, parameters.get(1).getGeneratorRange()));
-        if (!parameters.get(1).isCorrectValue())
+        volume.setValue(generator.generate(vol, generatorRange.getVolumeRange()));
+        if (!volume.isCorrectValue())
             throw new Exception("Volume is out of range! Process hes been stopped.");
 
-        parameters.get(2).setValue(generator.generate(mass, parameters.get(2).getGeneratorRange()));
-        if (!parameters.get(2).isCorrectValue())
+        this.mass.setValue(generator.generate(mass, generatorRange.getMassRange()));
+        if (!this.mass.isCorrectValue())
             throw new Exception("Mass is out of range! Process hes been stopped.");
 
     }
 
+    private void saveCurrentStage(int stageNum) {
+        DBManager.getINSTANCE()
+                .saveProductionInput(new ProductionInput(
+                        System.currentTimeMillis(), stageNum, pid,
+                        Arrays.asList(temperature, flexibility, surface, stiffness, amount, mass, volume)));
+    }
+
     private void secondStep(Double deltaTemp) throws Exception {
+        saveCurrentStage(2);
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
-        parameters.get(0).setValue(generator.generate((parameters.get(0).getValue() - deltaTemp), parameters.get(0).getGeneratorRange()));
-        if (!parameters.get(0).isCorrectValue())
+        temperature.setValue(generator.generate((temperature.getValue() - deltaTemp), generatorRange.getTemperatureRange()));
+        if (!temperature.isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
 
-        parameters.get(3).setValue(generator.generate(
-                ((parameters.get(2).getValue() / parameters.get(1).getValue()) / 8000.0) * (1 - (parameters.get(0).getValue() / 2000.0)),
-                parameters.get(3).getGeneratorRange()));
-        if (!parameters.get(3).isCorrectValue())
+        stiffness.setValue(generator.generate(
+                ((mass.getValue() / volume.getValue()) / 8000.0) * (1 - (temperature.getValue() / 2000.0)),
+                generatorRange.getStiffnessRange()));
+        if (!stiffness.isCorrectValue())
             throw new Exception("Stiffness is out of range! Process hes been stopped.");
 
-        double temporary = parameters.get(0).getValue();
+        double temporary = temperature.getValue();
         if (temporary < 400)
-            size.setValue(SizeType.small);
+            size = Parameter.Size.SMALL.getValue();
         else if (temporary < 600)
-            size.setValue(SizeType.medium);
+            size = Parameter.Size.MEDIUM.getValue();
         else
-            size.setValue(SizeType.large);
+            size = Parameter.Size.LARGE.getValue();
 
-        parameters.get(4).setValue(Math.floor(parameters.get(1).getValue() / size.getValue()));
-        //parameters.get(4).setValue(generator.generate(Math.floor(parameters.get(1).getValue() / size.getValue()) , parameters.get(4).getGeneratorRange()));
-        if (!parameters.get(4).isCorrectValue())
+        amount.setValue(Math.floor(volume.getValue() / size));
+        //amount.setValue(generator.generate(Math.floor(volume.getValue() / size.getValue()) , amount.getGeneratorRange()));
+        if (!amount.isCorrectValue())
             throw new Exception("Amount is out of range! Process hes been stopped.");
     }
 
     private void thirdStep() throws Exception {
+        saveCurrentStage(3);
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
-        parameters.get(0).setValue(generator.generate((parameters.get(0).getValue() - 300), parameters.get(0).getGeneratorRange()));
-        if (!parameters.get(0).isCorrectValue())
+        temperature.setValue(generator.generate((temperature.getValue() - 300), generatorRange.getTemperatureRange()));
+        if (!temperature.isCorrectValue())
             throw new Exception("Temperature is out of range! Process hes been stopped.");
 
-        parameters.get(5).setValue(generator.generate((parameters.get(4).getValue() * (size.getValue() / 0.002)), parameters.get(5).getGeneratorRange()));
-        if (!parameters.get(5).isCorrectValue())
+        surface.setValue(generator.generate((amount.getValue() * (size / 0.002)), generatorRange.getSurfaceRange()));
+        if (!surface.isCorrectValue())
             throw new Exception("Surface is out of range! Process hes been stopped.");
 
-        parameters.get(6).setValue(generator.generate((parameters.get(3).getValue() * parameters.get(0).getValue()), parameters.get(6).getGeneratorRange()));
-        if (!parameters.get(6).isCorrectValue())
+        flexibility.setValue(generator.generate((stiffness.getValue() * temperature.getValue()), generatorRange.getFlexibilityRange()));
+        if (!flexibility.isCorrectValue())
             throw new Exception("Flexibility is out of range! Process hes been stopped.");
     }
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
-        //1600.0, 2.0, 16000.0 
-        System.out.println("Production process started! Target parameters: max temperature = " + targetParams.get(0).getValue()
-                + ", surface = " + targetParams.get(1).getValue() + ", flexibility = " + targetParams.get(2).getValue());
+        Arrays.asList(temperature, flexibility, surface, stiffness, amount, this.mass, volume)
+                .forEach(it -> DBManager.getINSTANCE().saveParameter(it.toJson(pid)));
+        //1600.0, 2.0, 16000.0
+        System.out.println("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
+                + ", surface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
         firstStep(temp, vol, mass);
-        System.out.println("First step successfull! Obtained parameters: temperature = " + parameters.get(0).getValue()
-                + ", volume = " + parameters.get(1).getValue() + ", mass = " + parameters.get(2).getValue());
+        System.out.println("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
+                + ", volume = " + volume.getValue() + ", mass = " + this.mass.getValue());
         secondStep(1200.0);
-        System.out.println("Second step successfull! Obtained parameters: temperature = " + parameters.get(0).getValue()
-                + ", stiffness = " + parameters.get(3).getValue() + ", amount = " + parameters.get(4).getValue());
+        System.out.println("Second step successfull! Obtained parameters: temperature = " + temperature.getValue()
+                + ", stiffness = " + stiffness.getValue() + ", amount = " + amount.getValue());
         thirdStep();
-        System.out.println("Third step successfull! Obtained parameters: temperature = " + parameters.get(0).getValue()
-                + ", surface = " + parameters.get(5).getValue() + ", flexibility = " + parameters.get(6).getValue());
+        System.out.println("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
+                + ", surface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
-        return computeWJP();
+        Double result = computeWJP();
+        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature, outputSurface, outputFlexibility));
+        return result;
     }
 }

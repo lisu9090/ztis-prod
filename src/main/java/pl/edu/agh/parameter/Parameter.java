@@ -7,24 +7,65 @@ package pl.edu.agh.parameter;
  * it in some database or write to file.
  *
  * @param <T> T is value type, recommend to
- *           use simply types
+ *            use simply types
  */
 public abstract class Parameter<T> {
 
+    private String parameterName = getName();
     private T value;
+    private T minValue;
+    private T maxValue;
 
-    abstract T getMinValue();
+    abstract String getName();
 
-    abstract T getMaxValue();
+    public abstract Boolean isCorrectValue();
 
-    abstract T getOptimalValue();
+    Parameter(T minValue, T maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
 
-    abstract String getParameterName();
+    public void setValue(T value) {
+        this.value = value;
+    }
 
-    public T getValue(){
+    public T getMinValue() {
+        return this.minValue;
+    }
+
+    public T getMaxValue() {
+        return this.maxValue;
+    }
+
+    public T getValue() {
         return value;
     }
-    public void setValue(T value){
-        this.value = value;
+
+    public ParameterJson<T> toJson(Long pid) {
+        ParameterJson<T> result = new ParameterJson<>();
+        result.setId(System.currentTimeMillis());
+        result.setPid(pid);
+        result.setName(this.parameterName);
+        result.setValue(this.value);
+        result.setMinValue(this.minValue);
+        result.setMaxValue(this.maxValue);
+        return result;
+    }
+
+    public enum Size {
+        SMALL, MEDIUM, LARGE;
+
+        public Double getValue() {
+            switch (this) {
+                case LARGE:
+                    return 1.0;
+                case MEDIUM:
+                    return 0.2;
+                case SMALL:
+                    return 0.02;
+                default:
+                    return 0.2;
+            }
+        }
     }
 }

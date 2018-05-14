@@ -1,5 +1,6 @@
 package pl.edu.agh;
 
+import pl.edu.agh.parameter.GeneratorRange;
 import pl.edu.agh.productionmodel.ProductionProcess;
 import pl.edu.agh.random.NomiGen;
 
@@ -14,16 +15,15 @@ public class Main {
             process.setTargetParams(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]));
 
         //Ustawaimy zakresy przedzialow losowania
-        process.parameters.get(0).setGeneratorRange(60.0);
-        process.parameters.get(1).setGeneratorRange(0.05);
-        process.parameters.get(2).setGeneratorRange(100.0);
-        process.parameters.get(3).setGeneratorRange(0.1);
-        process.parameters.get(5).setGeneratorRange(1.0);
-        process.parameters.get(6).setGeneratorRange(1.0);
-
+        process.setGeneratorRange(new GeneratorRange.Builder()
+                .temperature(60.0)
+                .volume(0.05)
+                .mass(100.0)
+                .stiffness(0.1)
+                .amount(1.0)
+                .surface(1.0)
+                .build());
         process.setGenerator(new NomiGen());
-
-        //process.disableGenerator();
         try {
             Double wjp = process.runProcess(1900.0, 2.0, 16000.0); //uruchom caly proces z domyslnymi wartosciami i zwroc wjp
             System.out.println("Process sucessfull! Obtained WJP = " + wjp);

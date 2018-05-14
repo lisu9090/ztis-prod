@@ -15,6 +15,11 @@
         <artifactId>commons-math3</artifactId>
         <version>3.3</version>
     </dependency>
+    <dependency>
+        <groupId>io.jsondb</groupId>
+        <artifactId>jsondb-core</artifactId>
+        <version>1.0.36</version>
+    </dependency>
 </dependencies>
 
     <build>
