@@ -1,9 +1,10 @@
 package pl.edu.agh.db;
 
 import io.jsondb.JsonDBTemplate;
-import pl.edu.agh.parameter.*;
-
-import java.util.function.Consumer;
+import pl.edu.agh.parameter.ParameterJson;
+import pl.edu.agh.parameter.ProcessJson;
+import pl.edu.agh.parameter.ProductionInput;
+import pl.edu.agh.parameter.ProductionOutput;
 
 public class DBManager {
     private static DBManager INSTANCE;
