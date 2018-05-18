@@ -8,6 +8,8 @@ import pl.edu.agh.random.NomiGen;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProductionProcess {
     private Temperature temperature = new Temperature(0.0, 5000.0);
@@ -25,7 +27,6 @@ public class ProductionProcess {
     private Double size;
     private GeneratorRange generatorRange = new GeneratorRange.Builder().build();
 
-    private List<ParameterJson> parameters = new ArrayList<>();
     private IDistGenerator generator;
     private Long pid;
 
@@ -68,20 +69,24 @@ public class ProductionProcess {
 
     private void firstStep(Double temp, Double vol, Double mass) throws Exception {
         saveCurrentStage(1);
-        if (generator == null)
+        if (generator == null) {
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
+        }
 
         temperature.setValue(generator.generate(temp, generatorRange.getTemperatureRange()));
-        if (!temperature.isCorrectValue())
+        if (!temperature.isCorrectValue()) {
             throw new Exception("Temperature is out of range! Process hes been stopped.");
+        }
 
         volume.setValue(generator.generate(vol, generatorRange.getVolumeRange()));
-        if (!volume.isCorrectValue())
+        if (!volume.isCorrectValue()) {
             throw new Exception("Volume is out of range! Process hes been stopped.");
+        }
 
         this.mass.setValue(generator.generate(mass, generatorRange.getMassRange()));
-        if (!this.mass.isCorrectValue())
+        if (!this.mass.isCorrectValue()) {
             throw new Exception("Mass is out of range! Process hes been stopped.");
+        }
 
     }
 
@@ -89,7 +94,10 @@ public class ProductionProcess {
         DBManager.getINSTANCE()
                 .saveProductionInput(new ProductionInput(
                         System.currentTimeMillis(), stageNum, pid,
-                        Arrays.asList(temperature, flexibility, surface, stiffness, amount, mass, volume)));
+                        Stream.of(temperature, flexibility, surface, stiffness, amount, mass, volume)
+                                .map(it -> it.toJson(pid, stageNum))
+                                .collect(Collectors.toList())
+                                .toArray(new ParameterJson[7])));
     }
 
     private void secondStep(Double deltaTemp) throws Exception {
@@ -140,8 +148,6 @@ public class ProductionProcess {
     }
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
-        Arrays.asList(temperature, flexibility, surface, stiffness, amount, this.mass, volume)
-                .forEach(it -> DBManager.getINSTANCE().saveParameter(it.toJson(pid)));
         //1600.0, 2.0, 16000.0
         System.out.println("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
                 + ", surface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
@@ -156,7 +162,7 @@ public class ProductionProcess {
                 + ", surface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
         Double result = computeWJP();
-        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature, outputSurface, outputFlexibility));
+        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
         return result;
     }
 }

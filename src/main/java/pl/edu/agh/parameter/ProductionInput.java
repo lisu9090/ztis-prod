@@ -4,15 +4,30 @@ import io.jsondb.annotation.Document;
 import io.jsondb.annotation.Id;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Document(collection = "ProductionInput", schemaVersion = "1.0")
-public class ProductionInput implements Serializable{
+public class ProductionInput implements Serializable {
     @Id
     private Long id;
     private Integer stage;
     private Long pid;
-    private List<Parameter> parameters;
+    private ParameterJson[] parameters;
+
+
+    public ParameterJson[] getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(ParameterJson[] parameters) {
+        this.parameters = parameters;
+    }
+
+    public ProductionInput(Long id, Integer stage, Long pid, ParameterJson[] parameters) {
+        this.id = id;
+        this.stage = stage;
+        this.pid = pid;
+        this.parameters = parameters;
+    }
 
     public Long getId() {
         return id;
@@ -38,22 +53,7 @@ public class ProductionInput implements Serializable{
         this.pid = pid;
     }
 
-    public List<Parameter> getParameters() {
-        return parameters;
-    }
+    public ProductionInput() {
 
-    public void setParameters(List<Parameter> parameters) {
-        this.parameters = parameters;
-    }
-
-    public ProductionInput(){
-
-    }
-
-    public ProductionInput(Long id, Integer stage, Long pid, List<Parameter> parameters) {
-        this.id = id;
-        this.stage = stage;
-        this.pid = pid;
-        this.parameters = parameters;
     }
 }

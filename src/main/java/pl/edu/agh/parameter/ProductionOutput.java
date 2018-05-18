@@ -6,16 +6,16 @@ import io.jsondb.annotation.Id;
 import java.io.Serializable;
 
 @Document(collection = "ProductionResult", schemaVersion = "1.0")
-public class ProductionOutput implements Serializable{
+public class ProductionOutput implements Serializable {
     @Id
     private Long id;
     private Long pid;
     private Double result;
-    private Temperature temperature;
-    private Surface surface;
-    private Flexibility flexibility;
+    private ParameterJson temperature;
+    private ParameterJson surface;
+    private ParameterJson flexibility;
 
-    public ProductionOutput(){
+    public ProductionOutput() {
 
     }
 
@@ -43,31 +43,31 @@ public class ProductionOutput implements Serializable{
         this.result = result;
     }
 
-    public Temperature getTemperature() {
+    public ParameterJson getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Temperature temperature) {
+    public void setTemperature(ParameterJson temperature) {
         this.temperature = temperature;
     }
 
-    public Surface getSurface() {
+    public ParameterJson getSurface() {
         return surface;
     }
 
-    public void setSurface(Surface surface) {
+    public void setSurface(ParameterJson surface) {
         this.surface = surface;
     }
 
-    public Flexibility getFlexibility() {
+    public ParameterJson getFlexibility() {
         return flexibility;
     }
 
-    public void setFlexibility(Flexibility flexibility) {
+    public void setFlexibility(ParameterJson flexibility) {
         this.flexibility = flexibility;
     }
 
-    public ProductionOutput(Long id, Long pid, Double result, Temperature temperature, Surface surface, Flexibility flexibility) {
+    public ProductionOutput(Long id, Long pid, Double result, ParameterJson temperature, ParameterJson surface, ParameterJson flexibility) {
         this.id = id;
         this.pid = pid;
         this.result = result;

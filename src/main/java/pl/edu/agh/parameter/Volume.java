@@ -13,6 +13,6 @@ public class Volume extends Parameter<Double> {
 
     @Override
     public Boolean isCorrectValue() {
-        return getValue() >= getMaxValue() && getValue() <= getMinValue();
+        return getValue() <= getMaxValue() && getValue() >= getMinValue();
     }
 }

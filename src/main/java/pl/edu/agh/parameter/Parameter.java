@@ -20,6 +20,9 @@ public abstract class Parameter<T> {
 
     public abstract Boolean isCorrectValue();
 
+    public Parameter() {
+    }
+
     Parameter(T minValue, T maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -41,10 +44,11 @@ public abstract class Parameter<T> {
         return value;
     }
 
-    public ParameterJson<T> toJson(Long pid) {
+    public ParameterJson<T> toJson(Long pid, Integer stage) {
         ParameterJson<T> result = new ParameterJson<>();
         result.setId(System.currentTimeMillis());
         result.setPid(pid);
+        result.setStage(stage);
         result.setName(this.parameterName);
         result.setValue(this.value);
         result.setMinValue(this.minValue);
