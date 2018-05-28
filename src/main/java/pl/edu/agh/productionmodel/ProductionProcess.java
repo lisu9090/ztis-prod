@@ -1,5 +1,8 @@
 package pl.edu.agh.productionmodel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pl.edu.agh.Main;
 import pl.edu.agh.db.DBManager;
 import pl.edu.agh.parameter.*;
 import pl.edu.agh.random.IDistGenerator;
@@ -12,6 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProductionProcess {
+
+    private final static Logger logger = LoggerFactory.getLogger(ProductionProcess.class);
+
     private Temperature temperature = new Temperature(0.0, 5000.0);
     private Volume volume = new Volume(0.5, 20.0);
     private Mass mass = new Mass(0.0, 200000.0);
@@ -149,16 +155,16 @@ public class ProductionProcess {
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
         //1600.0, 2.0, 16000.0
-        System.out.println("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
+        logger.debug("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
                 + ", surface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
         firstStep(temp, vol, mass);
-        System.out.println("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
+        logger.debug("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", volume = " + volume.getValue() + ", mass = " + this.mass.getValue());
         secondStep(1200.0);
-        System.out.println("Second step successfull! Obtained parameters: temperature = " + temperature.getValue()
+        logger.debug("Second step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", stiffness = " + stiffness.getValue() + ", amount = " + amount.getValue());
         thirdStep();
-        System.out.println("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
+        logger.debug("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", surface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
         Double result = computeWJP();

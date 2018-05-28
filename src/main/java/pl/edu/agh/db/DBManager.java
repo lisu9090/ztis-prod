@@ -6,13 +6,15 @@ import pl.edu.agh.parameter.ProcessJson;
 import pl.edu.agh.parameter.ProductionInput;
 import pl.edu.agh.parameter.ProductionOutput;
 
+import java.io.File;
+
 public class DBManager {
     private static DBManager INSTANCE;
     private JsonDBTemplate jsonDb;
 
     private DBManager() {
         String packageDir = "pl.edu.agh.parameter";
-        jsonDb = new JsonDBTemplate(System.getProperty("user.dir"), packageDir);
+        jsonDb = new JsonDBTemplate(new File("src/main/resources/json").getAbsolutePath(), packageDir);
         if (!jsonDb.collectionExists(ProductionInput.class)) {
             jsonDb.createCollection(ProductionInput.class);
         }

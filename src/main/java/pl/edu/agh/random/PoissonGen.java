@@ -1,8 +1,12 @@
 package pl.edu.agh.random;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PoissonGen implements IDistGenerator {
+
+    private final static Logger logger = LoggerFactory.getLogger(PoissonGen.class);
     private Double mean;
 
     public PoissonGen() {
@@ -20,7 +24,7 @@ public class PoissonGen implements IDistGenerator {
     @Override
     public Double generate(Double paramValue, Double range) {
         if (mean > 1 || mean < 0) {
-            System.out.println("PoissonGen: mean is out of range! " + mean);
+            logger.warn("PoissonGen: mean is out of range! " + mean);
             return paramValue;
         }
         return new PoissonDistribution(range * mean, range).sample() + paramValue - (range / 2);
