@@ -13,3 +13,10 @@
 {"id":1527544211932,"pid":1527544211477,"stage":null,"name":"Amount","value":null,"minValue":0.0,"maxValue":10000.0}
 {"id":1527544211948,"pid":1527544211477,"stage":null,"name":"Mass","value":null,"minValue":0.0,"maxValue":200000.0}
 {"id":1527544211962,"pid":1527544211477,"stage":null,"name":"Volume","value":null,"minValue":0.5,"maxValue":20.0}
+{"id":1527619242127,"pid":1527619241697,"stage":null,"name":"Temperature","value":null,"minValue":0.0,"maxValue":5000.0}
+{"id":1527619242145,"pid":1527619241697,"stage":null,"name":"Flexibility","value":null,"minValue":0.0,"maxValue":1000000.0}
+{"id":1527619242158,"pid":1527619241697,"stage":null,"name":"Surface","value":null,"minValue":0.0,"maxValue":1000000.0}
+{"id":1527619242171,"pid":1527619241697,"stage":null,"name":"Stiffness","value":null,"minValue":0.0,"maxValue":10.0}
+{"id":1527619242184,"pid":1527619241697,"stage":null,"name":"Amount","value":null,"minValue":0.0,"maxValue":10000.0}
+{"id":1527619242197,"pid":1527619241697,"stage":null,"name":"Mass","value":null,"minValue":0.0,"maxValue":200000.0}
+{"id":1527619242211,"pid":1527619241697,"stage":null,"name":"Volume","value":null,"minValue":0.5,"maxValue":20.0}
