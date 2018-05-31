@@ -1,4 +1,4 @@
-package pl.edu.agh.controller;
+package pl.edu.agh.ui.controller;
 
 
 import javafx.fxml.FXML;

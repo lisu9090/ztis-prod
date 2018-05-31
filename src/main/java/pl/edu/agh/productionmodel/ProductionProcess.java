@@ -41,7 +41,7 @@ public class ProductionProcess {
         DBManager.getINSTANCE().saveProcess(new ProcessJson(pid));
     }
 
-    public ProductionProcess(Double targetTemp, Double targetSurf, Double targetFlex) {
+    public ProductionProcess(Double targetTemp, Double targetFlex, Double targetSurf) {
         this();
         outputTemperature.setValue(targetTemp);
         outputSurface.setValue(targetSurf);
@@ -49,7 +49,7 @@ public class ProductionProcess {
         generator = new NomiGen();
     }
 
-    public void setTargetParams(Double temp, Double surf, Double flex) {
+    public void setTargetParams(Double temp, Double flex, Double surf) {
         outputTemperature.setValue(temp);
         outputSurface.setValue(surf);
         outputFlexibility.setValue(flex);
@@ -156,7 +156,7 @@ public class ProductionProcess {
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
         //1600.0, 2.0, 16000.0
         logger.debug("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
-                + ", surface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
+                + ", targetSurface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
         firstStep(temp, vol, mass);
         logger.debug("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", volume = " + volume.getValue() + ", mass = " + this.mass.getValue());
@@ -165,7 +165,7 @@ public class ProductionProcess {
                 + ", stiffness = " + stiffness.getValue() + ", amount = " + amount.getValue());
         thirdStep();
         logger.debug("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
-                + ", surface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
+                + ", targetSurface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
         Double result = computeWJP();
         DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));

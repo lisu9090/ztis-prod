@@ -1,17 +1,12 @@
 package pl.edu.agh;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.edu.agh.parameter.GeneratorRange;
-import pl.edu.agh.productionmodel.ProductionProcess;
-import pl.edu.agh.random.NomiGen;
 
 public class Main extends Application {
 

@@ -1,4 +1,4 @@
-package pl.edu.agh.log.appender;
+package pl.edu.agh.ui.log.appender;
 
 
 
