@@ -7,6 +7,7 @@ import pl.edu.agh.parameter.ProductionInput;
 import pl.edu.agh.parameter.ProductionOutput;
 
 import java.io.File;
+import java.util.List;
 
 public class DBManager {
     private static DBManager INSTANCE;
@@ -51,4 +52,27 @@ public class DBManager {
     public void saveParameter(ParameterJson parameterJson) {
         jsonDb.insert(parameterJson);
     }
+
+    public List<ProcessJson> findAllProcesses() {
+        return jsonDb.findAll(ProcessJson.class);
+    }
+
+    public List<ParameterJson> findAllParametersForPid(Long pid) {
+        String pidEquality = String.format("/.[pid='%d']", pid);
+        return jsonDb.find(pidEquality, ParameterJson.class);
+    }
+
+    public List<ProductionInput> findAllInputForPid(Long pid) {
+        String pidEquality = String.format("/.[pid='%d']", pid);
+        return jsonDb.find(pidEquality, ProductionInput.class);
+    }
+
+    public List<ProductionOutput> findAllOutputForPid(Long pid) {
+        String pidEquality = String.format("/.[pid='%d']", pid);
+        return jsonDb.find(pidEquality, ProductionOutput.class);
+    }
+
+
+
+
 }

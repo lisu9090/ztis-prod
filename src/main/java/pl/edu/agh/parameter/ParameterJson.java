@@ -4,6 +4,8 @@ import io.jsondb.annotation.Document;
 import io.jsondb.annotation.Id;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 @Document(collection = "Parameters", schemaVersion = "1.0")
 public class ParameterJson<T> implements Serializable {
@@ -74,5 +76,17 @@ public class ParameterJson<T> implements Serializable {
 
     public void setMaxValue(T maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public Parameter<T> toObject()  {
+        Object object = null;
+        try {
+            Class<Parameter<T>> clazz = (Class<Parameter<T>>) Class.forName("pl.edu.agh.parameter."+this.name);
+            Constructor<?> cons = clazz.getConstructor(minValue.getClass(), maxValue.getClass()); // nie wiem czy da sie jakos obejsc parametrized type tutaj
+            object = cons.newInstance(this.minValue, this.maxValue);
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return (Parameter<T>) object;
     }
 }

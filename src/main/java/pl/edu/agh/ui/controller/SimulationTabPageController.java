@@ -51,6 +51,7 @@ public class SimulationTabPageController {
 
     @FXML
     public void initialize() {
+        logger.info("init");
         bucketSize = new ToggleGroup();
         bucketAuto.setToggleGroup(bucketSize);
         bucketAuto.setSelected(true);

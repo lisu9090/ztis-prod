@@ -1,6 +1,7 @@
 package pl.edu.agh.parameter;
 
 public class Temperature extends Parameter<Double> {
+
     public Temperature(Double minValue, Double maxValue) {
         super(minValue, maxValue);
     }
@@ -10,8 +11,4 @@ public class Temperature extends Parameter<Double> {
         return getValue() <= getMaxValue() && getValue() >= getMinValue();
     }
 
-    @Override
-    String getName() {
-        return getClass().getSimpleName();
-    }
 }

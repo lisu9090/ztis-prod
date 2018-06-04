@@ -2,15 +2,11 @@ package pl.edu.agh.productionmodel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.edu.agh.Main;
 import pl.edu.agh.db.DBManager;
 import pl.edu.agh.parameter.*;
 import pl.edu.agh.random.IDistGenerator;
 import pl.edu.agh.random.NomiGen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -167,8 +163,8 @@ public class ProductionProcess {
         logger.debug("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", targetSurface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
-        Double result = computeWJP();
-        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
-        return result;
+        Double wjp = computeWJP();
+        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, wjp, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
+        return wjp;
     }
 }

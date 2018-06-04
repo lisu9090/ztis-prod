@@ -374,7 +374,7 @@
                                             <Font name="System Bold" size="16.0" />
                                         </font>
                                  <GridPane.margin>
-                                    <Insets bottom="10.0" />
+                                    <Insets bottom="10.0" top="10.0" />
                                  </GridPane.margin>
                                     </Label>
                                 </children>
@@ -382,9 +382,9 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </padding>
                             </GridPane>
-                            <AnchorPane layoutY="53.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
+                            <AnchorPane layoutY="53.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
                                 <children>
-                                    <BorderPane layoutX="10.0" layoutY="-8.0" prefHeight="245.0" prefWidth="740.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+                                    <BorderPane layoutX="10.0" layoutY="-8.0" prefHeight="183.0" prefWidth="726.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                         <center>
                                             <TextArea fx:id="textAreaConsole" editable="false" focusTraversable="false" prefWidth="665.0" BorderPane.alignment="CENTER">
                                        <padding>
@@ -393,7 +393,7 @@
                                     </TextArea>
                                         </center>
                                         <right>
-                                            <VBox maxWidth="-Infinity" minWidth="75.0" prefHeight="200.0" prefWidth="75.0" BorderPane.alignment="CENTER">
+                                            <VBox maxWidth="-Infinity" prefHeight="200.0" BorderPane.alignment="CENTER">
                                                 <BorderPane.margin>
                                                     <Insets left="10.0" />
                                                 </BorderPane.margin>
@@ -417,7 +417,7 @@
                                             </VBox>
                                         </right>
                                         <bottom>
-                                            <HBox fillHeight="false" maxHeight="75.0" minHeight="48.0" prefHeight="48.0" prefWidth="740.0" BorderPane.alignment="CENTER">
+                                            <HBox fillHeight="false" prefWidth="740.0" BorderPane.alignment="CENTER">
                                                 <children>
                                                     <Button mnemonicParsing="false" prefWidth="75.0" text="Stop">
                                                         <HBox.margin>
