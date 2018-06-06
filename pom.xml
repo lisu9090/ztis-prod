@@ -20,6 +20,10 @@
         <artifactId>jsondb-core</artifactId>
         <version>1.0.36</version>
     </dependency>
+    <dependency>
+        <groupId>com.tilab.jade</groupId>
+        <artifactId>jade</artifactId>
+    </dependency>
 </dependencies>
 
     <build>
