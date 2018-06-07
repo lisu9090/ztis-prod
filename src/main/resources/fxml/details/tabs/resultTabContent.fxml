@@ -23,14 +23,14 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label fx:id="wjp" text="WJP:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="WJP:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="Output temperature:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="Output surface:" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="Output flexibility:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label fx:id="temperature" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <Label fx:id="surface" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="3" />
             <Label fx:id="flexibility" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-            <Label fx:id="temperature" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label fx:id="wjp" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>

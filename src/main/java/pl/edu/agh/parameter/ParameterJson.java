@@ -6,6 +6,7 @@ import io.jsondb.annotation.Id;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 @Document(collection = "Parameters", schemaVersion = "1.0")
 public class ParameterJson<T> implements Serializable {
@@ -82,8 +83,10 @@ public class ParameterJson<T> implements Serializable {
         Object object = null;
         try {
             Class<Parameter<T>> clazz = (Class<Parameter<T>>) Class.forName("pl.edu.agh.parameter."+this.name);
-            Constructor<?> cons = clazz.getConstructor(minValue.getClass(), maxValue.getClass()); // nie wiem czy da sie jakos obejsc parametrized type tutaj
+            Constructor<?> cons = clazz.getConstructor(this.minValue.getClass(), this.maxValue.getClass()); // nie wiem czy da sie jakos obejsc parametrized type tutaj
             object = cons.newInstance(this.minValue, this.maxValue);
+            Method m = object.getClass().getSuperclass().getMethod("setValue", Object.class);
+            m.invoke(object, this.value);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException  | InvocationTargetException e) {
             e.printStackTrace();
         }

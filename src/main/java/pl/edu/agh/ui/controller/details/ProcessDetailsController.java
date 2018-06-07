@@ -11,11 +11,16 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.edu.agh.parameter.Parameter;
 import pl.edu.agh.ui.controller.InputOutputStageRefresh;
 import pl.edu.agh.ui.util.ProcessDetailsWrapper;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 
@@ -42,12 +47,10 @@ public class ProcessDetailsController  {
             detailsStage = new Stage();
             detailsStage.setScene(scene);
             detailsStage.setResizable(false);
-            detailsStage.setTitle("test name");
             detailsStage.initModality(Modality.NONE);
             detailsStage.initOwner(dbStage.getScene().getWindow());
         }
-        logger.info("clean shit");
-
+        detailsStage.setTitle("Process " + toMillis(tabData.getPid()));
         detailsStage.toFront();
         detailsStage.show();
     }
@@ -59,7 +62,6 @@ public class ProcessDetailsController  {
         Arrays.asList("Stage 1", "Stage 2", "Stage 3", "Result").forEach(name -> processStageTabPane.getTabs().add(new Tab(name)));
         processStageTabPane.getSelectionModel().clearSelection();
         processStageTabPane.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
-            logger.info(tabData.toString());
             if (newTab.getContent() == null) {
                 logger.info("not init tab");
                 FXMLLoader loader = new FXMLLoader();
@@ -67,15 +69,19 @@ public class ProcessDetailsController  {
                         Parent root = loader.load(ProcessDetailsController.class.getResource("/fxml/details/tabs/"+ StringUtils.replace(newTab.getText(), " ", "").toLowerCase()+"TabContent.fxml").openStream());
                         newTab.setContent(root);
                         processDetailsTabsControllerMap.put(newTab.getText(), loader.getController());
-                        ((InputOutputStageRefresh) loader.getController()).refresh(444);
+                        ((InputOutputStageRefresh) loader.getController()).refresh(toMillis(tabData.getPid()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
-                ((InputOutputStageRefresh) processDetailsTabsControllerMap.get(newTab.getText())).refresh(555);
+                ((InputOutputStageRefresh) processDetailsTabsControllerMap.get(newTab.getText())).refresh(toMillis(tabData.getPid()));
             }
         });
-       processStageTabPane.getSelectionModel().selectFirst();
+        processStageTabPane.getSelectionModel().selectFirst();
+    }
+
+    private static Long toMillis(LocalDateTime timePid) {
+        return timePid.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static ProcessDetailsController getInstance() {

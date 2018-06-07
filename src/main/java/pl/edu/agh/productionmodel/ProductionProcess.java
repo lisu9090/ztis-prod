@@ -133,6 +133,7 @@ public class ProductionProcess {
 
     private void thirdStep() throws Exception {
         saveCurrentStage(3);
+
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
