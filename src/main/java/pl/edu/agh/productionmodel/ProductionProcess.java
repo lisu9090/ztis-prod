@@ -70,6 +70,9 @@ public class ProductionProcess {
     }
 
     private void firstStep(Double temp, Double vol, Double mass) throws Exception {
+        temperature.setValue(temp);
+        volume.setValue(vol);
+        this.mass.setValue(mass);
         saveCurrentStage(1);
         if (generator == null) {
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
