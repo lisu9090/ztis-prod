@@ -1,17 +1,19 @@
 package pl.edu.agh.productionmodel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.edu.agh.db.DBManager;
 import pl.edu.agh.parameter.*;
 import pl.edu.agh.random.IDistGenerator;
 import pl.edu.agh.random.NomiGen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProductionProcess {
+
+    private final static Logger logger = LoggerFactory.getLogger(ProductionProcess.class);
+
     private Temperature temperature = new Temperature(0.0, 5000.0);
     private Volume volume = new Volume(0.5, 20.0);
     private Mass mass = new Mass(0.0, 200000.0);
@@ -35,7 +37,7 @@ public class ProductionProcess {
         DBManager.getINSTANCE().saveProcess(new ProcessJson(pid));
     }
 
-    public ProductionProcess(Double targetTemp, Double targetSurf, Double targetFlex) {
+    public ProductionProcess(Double targetTemp, Double targetFlex, Double targetSurf) {
         this();
         outputTemperature.setValue(targetTemp);
         outputSurface.setValue(targetSurf);
@@ -43,7 +45,7 @@ public class ProductionProcess {
         generator = new NomiGen();
     }
 
-    public void setTargetParams(Double temp, Double surf, Double flex) {
+    public void setTargetParams(Double temp, Double flex, Double surf) {
         outputTemperature.setValue(temp);
         outputSurface.setValue(surf);
         outputFlexibility.setValue(flex);
@@ -68,6 +70,9 @@ public class ProductionProcess {
     }
 
     private void firstStep(Double temp, Double vol, Double mass) throws Exception {
+        temperature.setValue(temp);
+        volume.setValue(vol);
+        this.mass.setValue(mass);
         saveCurrentStage(1);
         if (generator == null) {
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
@@ -131,6 +136,7 @@ public class ProductionProcess {
 
     private void thirdStep() throws Exception {
         saveCurrentStage(3);
+
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
@@ -149,20 +155,20 @@ public class ProductionProcess {
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
         //1600.0, 2.0, 16000.0
-        System.out.println("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
-                + ", surface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
+        logger.debug("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
+                + ", targetSurface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
         firstStep(temp, vol, mass);
-        System.out.println("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
+        logger.debug("First step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", volume = " + volume.getValue() + ", mass = " + this.mass.getValue());
         secondStep(1200.0);
-        System.out.println("Second step successfull! Obtained parameters: temperature = " + temperature.getValue()
+        logger.debug("Second step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", stiffness = " + stiffness.getValue() + ", amount = " + amount.getValue());
         thirdStep();
-        System.out.println("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
-                + ", surface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
+        logger.debug("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
+                + ", targetSurface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
 
-        Double result = computeWJP();
-        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, result, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
-        return result;
+        Double wjp = computeWJP();
+        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, wjp, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
+        return wjp;
     }
 }

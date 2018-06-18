@@ -11,12 +11,10 @@ package pl.edu.agh.parameter;
  */
 public abstract class Parameter<T> {
 
-    private String parameterName = getName();
+    private String parameterName = getClass().getSimpleName();
     private T value;
     private T minValue;
     private T maxValue;
-
-    abstract String getName();
 
     public abstract Boolean isCorrectValue();
 

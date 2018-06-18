@@ -7,11 +7,6 @@ public class Stiffness extends Parameter<Double> {
     }
 
     @Override
-    String getName() {
-        return getClass().getSimpleName();
-    }
-
-    @Override
     public Boolean isCorrectValue() {
         return getValue() <= getMaxValue() && getValue() >= getMinValue();
     }

@@ -10,7 +10,7 @@ public class ProductionOutput implements Serializable {
     @Id
     private Long id;
     private Long pid;
-    private Double result;
+    private Double wjp;
     private ParameterJson temperature;
     private ParameterJson surface;
     private ParameterJson flexibility;
@@ -35,12 +35,12 @@ public class ProductionOutput implements Serializable {
         this.pid = pid;
     }
 
-    public Double getResult() {
-        return result;
+    public Double getWjp() {
+        return wjp;
     }
 
-    public void setResult(Double result) {
-        this.result = result;
+    public void setWjp(Double wjp) {
+        this.wjp = wjp;
     }
 
     public ParameterJson getTemperature() {
@@ -67,10 +67,10 @@ public class ProductionOutput implements Serializable {
         this.flexibility = flexibility;
     }
 
-    public ProductionOutput(Long id, Long pid, Double result, ParameterJson temperature, ParameterJson surface, ParameterJson flexibility) {
+    public ProductionOutput(Long id, Long pid, Double wjp, ParameterJson temperature, ParameterJson surface, ParameterJson flexibility) {
         this.id = id;
         this.pid = pid;
-        this.result = result;
+        this.wjp = wjp;
         this.temperature = temperature;
         this.surface = surface;
         this.flexibility = flexibility;
