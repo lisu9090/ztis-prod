@@ -5,8 +5,10 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import pl.edu.agh.random.AgentMessages;
 
 import java.util.ArrayList;
 
@@ -14,11 +16,10 @@ import static java.lang.Thread.sleep;
 
 
 public class ProductionAgent extends Agent {
-
     private ArrayList<AID> processAgents = new ArrayList<>();
     private ArrayList<AID> systemAgents = new ArrayList<>();
 
-    private void createProcess(){
+    private AID createProcess(){
         ContainerController cc = getContainerController();
         String processNickname = "Process-agent"+Integer.toString(processAgents.size());
         Object [] args = new Object[1];
@@ -28,18 +29,16 @@ public class ProductionAgent extends Agent {
             AgentController process = cc.createNewAgent(processNickname,
                     "pl.edu.agh.agents.ProcessAgent", args);
             process.start();
-            processAgents.add(new AID(processNickname, AID.ISLOCALNAME));
 
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+        return new AID(processNickname, AID.ISLOCALNAME);
     }
 
     private boolean checkAgent(AID agentAddress){
-        final int CHECK_AGENT = 100;
-
-        ACLMessage msg = new ACLMessage(CHECK_AGENT);
+        ACLMessage msg = new ACLMessage(AgentMessages.CHECK_AGENT);
         msg.setContent("success");
         msg.addReceiver(agentAddress);
         send(msg);
@@ -49,18 +48,18 @@ public class ProductionAgent extends Agent {
             e.printStackTrace();
         }
         MessageTemplate messageTmpl = MessageTemplate.and(MessageTemplate.MatchSender(agentAddress),
-                MessageTemplate.MatchPerformative(CHECK_AGENT));
+                MessageTemplate.MatchPerformative(AgentMessages.CHECK_AGENT));
         ACLMessage reply = receive(messageTmpl);
         return reply != null;
     }
 
     protected void setup()
     {
-        final int START_PROCESS = 101;
         Object [] args = new Object[1];
         args[0]=getLocalName();
         ContainerController cc = getContainerController();
 
+        //initialize UI agent
         try {
 
             AgentController ui = cc.createNewAgent("UI-agent",
@@ -73,9 +72,7 @@ public class ProductionAgent extends Agent {
             System.out.println(e.getMessage());
         }
 
-
-
-
+        //initialize database agent
         try {
             AgentController database = cc.createNewAgent("Database-agent",
                     "pl.edu.agh.agents.DatabaseAgent", args);
@@ -88,29 +85,74 @@ public class ProductionAgent extends Agent {
         }
         System.out.println("Agents initialized");
 
-        createProcess();
-
-       if(checkAgent(processAgents.get(processAgents.size()-1)))
-           System.out.println("Process agent working!");
-
         addBehaviour(new CyclicBehaviour(this)
         {
             public void action()
             {
 
-                MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchSender(
-                        systemAgents.get(0)),MessageTemplate.MatchPerformative(START_PROCESS));
-                ACLMessage orderProcessStart = receive(template);
+                ACLMessage msg;
 
-                if (orderProcessStart!=null){
-                    int processNumber = Integer.parseInt(orderProcessStart.getContent());
-                    ACLMessage msgProcessStart = new ACLMessage(START_PROCESS);
-                    msgProcessStart.setContent("success");
-                    msgProcessStart.addReceiver(processAgents.get(processNumber-1));
-                    send(msgProcessStart);
+                ArrayList<MessageTemplate> templates = new ArrayList<>();
+                templates.add(MessageTemplate.and(MessageTemplate.MatchSender(
+                        systemAgents.get(0)),MessageTemplate.MatchPerformative(AgentMessages.START_PROCESS_AGENT)));
+                templates.add(MessageTemplate.and(MessageTemplate.MatchSender(
+                        systemAgents.get(0)),MessageTemplate.MatchPerformative(AgentMessages.SET_PROCESS_VALUES)));
+                templates.add(MessageTemplate.MatchPerformative(AgentMessages.SET_PROCESS_VALUES_ACK));
+                templates.add(MessageTemplate.MatchPerformative(AgentMessages.START_PROCESS));
+                templates.add(MessageTemplate.MatchPerformative(AgentMessages.RECEIVE_RESULT));
+
+                ACLMessage [] checkMsg = new ACLMessage[templates.size()];
+                int counter = 0;
+                for(MessageTemplate checkState: templates){
+                    checkMsg[counter++] = receive(checkState);
                 }
+                for(ACLMessage check: checkMsg) {
+                    if (check != null) {
+                        //confirming that agent is working
+                        switch(check.getPerformative()){
+                            case(AgentMessages.START_PROCESS_AGENT):
+                                AID processTag = createProcess();
+                                processAgents.add(processTag);
+                                boolean processConfirmation = checkAgent(processTag);
+                                if(processConfirmation == true){
+                                    msg = new ACLMessage(AgentMessages.START_PROCESS_AGENT_ACK);
+                                    msg.setContent("Process Agent created.");
+                                    msg.addReceiver(systemAgents.get(0));
+                                    send(msg);
+                                }
+                                break;
+                            case(AgentMessages.SET_PROCESS_VALUES):
+                                String parameters = check.getContent();
+                                msg = new ACLMessage(AgentMessages.SET_PROCESS_VALUES);
+                                msg.addReceiver(processAgents.get(processAgents.size()-1));
+                                msg.setContent(parameters);
+                                send(msg);
+                                break;
+                            case(AgentMessages.SET_PROCESS_VALUES_ACK):
+                                msg = new ACLMessage(AgentMessages.SET_PROCESS_VALUES_ACK);
+                                msg.setContent("Values set.");
+                                msg.addReceiver(systemAgents.get(0));
+                                send(msg);
+                                break;
+                            case(AgentMessages.START_PROCESS):
+                                msg = new ACLMessage(AgentMessages.START_PROCESS);
+                                msg.addReceiver(processAgents.get(processAgents.size()-1));
+                                msg.setContent("");
+                                send(msg);
+                                break;
+                            case(AgentMessages.RECEIVE_RESULT):
+                                String finish = check.getContent();
+                                msg = new ACLMessage(AgentMessages.RECEIVE_RESULT);
+                                msg.addReceiver(systemAgents.get(0));
+                                msg.setContent(finish);
+                                send(msg);
 
-                block();
+                            default:
+                                break;
+                        }
+
+                    }
+                }
             }
         });
 

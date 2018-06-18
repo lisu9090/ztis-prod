@@ -1,20 +1,35 @@
 package pl.edu.agh.ui.controller;
 
+
+import jade.core.*;
+import jade.core.Runtime;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
+import jade.wrapper.ControllerException;
+import jade.wrapper.gateway.JadeGateway;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.edu.agh.Main;
+import pl.edu.agh.agents.InterfaceUI;
+import pl.edu.agh.agents.UIAgent;
 import pl.edu.agh.parameter.GeneratorRange;
 import pl.edu.agh.productionmodel.ProductionProcess;
 import pl.edu.agh.random.*;
+import pl.edu.agh.random.MainContainer;
 import pl.edu.agh.ui.log.appender.StaticOutputStreamAppender;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Properties;
 
-public class SimulationTabPageController {
+public class SimulationTabPageController extends Agent{
 
     private final static Logger logger = LoggerFactory.getLogger(SimulationTabPageController.class);
 
@@ -73,7 +88,7 @@ public class SimulationTabPageController {
     }
 
     @FXML
-    private void onRunButtonClick(ActionEvent event) {
+    private void onRunButtonClick(ActionEvent event) throws ControllerException, InterruptedException {
 
         Integer amount = Integer.parseInt(simulationsCount.getText());
         String typeName = distributionType.getSelectionModel().getSelectedItem();
@@ -94,6 +109,16 @@ public class SimulationTabPageController {
         //STEP3
         Double _flexibility = Double.parseDouble(flexibility.getText()); // range
 
+        AgentController ac = MainContainer.cc.getAgent("UI-agent");
+        InterfaceUI uiObj = ac.getO2AInterface(InterfaceUI.class);
+        Double wjp = uiObj.runProcess(_targetMaxTemp,_targetFlex,_targetSurface, typeName,_deltaTemperature,_volume,_mass);
+        logger.debug("Process sucessfull! Obtained WJP = " + wjp);
+        /*
+        ACLMessage msgProcessStart = new ACLMessage(1);
+        msgProcessStart.setContent("lol");
+        msgProcessStart.addReceiver(new AID( "Process-agent", AID.ISLOCALNAME));
+        uiObj.send(msgProcessStart);
+
 
         ProductionProcess process = new ProductionProcess(_targetMaxTemp, _targetFlex, _targetSurface); //instancja processu z zainicjalizowanymi docelowymi parametrami
         //Ustawaimy zakresy przedzialow losowania
@@ -107,13 +132,14 @@ public class SimulationTabPageController {
                 .build());
         process.setGenerator(resolveFromName(typeName));
         try {
-            Double wjp = process.runProcess(_deltaTemperature, _volume, _mass);
+            //Double wjp = process.runProcess(_deltaTemperature, _volume, _mass);
             //Double wjp = process.runProcess(1900.0, 2.0, 16000.0); //uruchom caly proces z domyslnymi wartosciami i zwroc wjp
-            logger.debug("Process sucessfull! Obtained WJP = " + wjp);
+            //logger.debug("Process sucessfull! Obtained WJP = " + wjp);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
+        */
     }
 
     private IDistGenerator resolveFromName(String typeName) {
