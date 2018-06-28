@@ -1,6 +1,9 @@
 package pl.edu.agh.ui.controller;
 
 
+import jade.wrapper.AgentController;
+import jade.wrapper.ControllerException;
+import jade.wrapper.StaleProxyException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,10 +14,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.edu.agh.agents.InterfaceUI;
 import pl.edu.agh.db.DBManager;
 import pl.edu.agh.parameter.ProcessJson;
 import pl.edu.agh.parameter.ProductionInput;
 import pl.edu.agh.parameter.ProductionOutput;
+import pl.edu.agh.random.MainContainer;
 import pl.edu.agh.ui.controller.details.ProcessDetailsController;
 import pl.edu.agh.ui.util.ProcessDetailsWrapper;
 
@@ -79,14 +84,24 @@ public class DatabaseTabPageController {
 
         observableList = FXCollections.observableArrayList(prepareData());
         databaseView.setItems(observableList);
-
         databaseView.getColumns().addAll(pidColumn, stageMultiColumn, outputMultiColumn);
 
     }
 
-    private List<ProcessDetailsWrapper> prepareData() {
+    private List<ProcessDetailsWrapper> prepareData(){
         List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
+
+        AgentController ac = null;
+        InterfaceUI uiObj = null;
+        try {
+            ac = MainContainer.cc.getAgent("UI-agent");
+            uiObj = ac.getO2AInterface(InterfaceUI.class);
+        } catch (ControllerException e) {
+            e.printStackTrace();
+        }
+
         List<ProcessJson> processes = DBManager.getINSTANCE().findAllProcesses();
+
         for (ProcessJson p : processes) {
             System.out.println("Process ID: " + p.getId());
             Long pid = p.getId();

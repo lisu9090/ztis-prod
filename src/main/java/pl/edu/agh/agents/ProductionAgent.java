@@ -100,6 +100,8 @@ public class ProductionAgent extends Agent {
                 templates.add(MessageTemplate.MatchPerformative(AgentMessages.SET_PROCESS_VALUES_ACK));
                 templates.add(MessageTemplate.MatchPerformative(AgentMessages.START_PROCESS));
                 templates.add(MessageTemplate.MatchPerformative(AgentMessages.RECEIVE_RESULT));
+                templates.add(MessageTemplate.MatchPerformative(AgentMessages.GET_PROCESS_IDS));
+                templates.add(MessageTemplate.MatchPerformative(AgentMessages.GET_PROCESS_IDS_ACK));
 
                 ACLMessage [] checkMsg = new ACLMessage[templates.size()];
                 int counter = 0;
@@ -146,11 +148,24 @@ public class ProductionAgent extends Agent {
                                 msg.addReceiver(systemAgents.get(0));
                                 msg.setContent(finish);
                                 send(msg);
-
+                                break;
+                            case(AgentMessages.GET_PROCESS_IDS):
+                                msg = new ACLMessage(AgentMessages.GET_PROCESS_IDS);
+                                msg.addReceiver(systemAgents.get(1));
+                                msg.setContent("");
+                                send(msg);
+                                break;
+                            case(AgentMessages.GET_PROCESS_IDS_ACK):
+                                msg = new ACLMessage(AgentMessages.GET_PROCESS_IDS_ACK);
+                                String pids = check.getContent();
+                                msg.addReceiver(systemAgents.get(0));
+                                msg.setContent(pids);
+                                send(msg);
+                                System.out.println("Whatever");
+                                break;
                             default:
                                 break;
                         }
-
                     }
                 }
             }

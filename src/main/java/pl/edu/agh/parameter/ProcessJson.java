@@ -6,7 +6,7 @@ import io.jsondb.annotation.Id;
 import java.io.Serializable;
 
 @Document(collection = "Processes", schemaVersion = "1.0")
-public class ProcessJson implements Serializable{
+public class ProcessJson{
     @Id
     private Long id;
 

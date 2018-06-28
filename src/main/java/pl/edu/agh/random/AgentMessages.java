@@ -13,4 +13,6 @@ public class AgentMessages {
     public static final int START_PROCESS = 104;
     public static final int SET_PROCESS_VALUES_ACK = 105;
     public static final int RECEIVE_RESULT = 106;
+    public static final int GET_PROCESS_IDS = 107;
+    public static final int GET_PROCESS_IDS_ACK = 108;
 }
