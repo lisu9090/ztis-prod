@@ -28,11 +28,14 @@ import pl.edu.agh.ui.log.appender.StaticOutputStreamAppender;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimulationTabPageController extends Agent{
 
     private final static Logger logger = LoggerFactory.getLogger(SimulationTabPageController.class);
-
+    private static final String numberRegexp = "\\d*";
+    
     public TextField simulationsCount;
     public ChoiceBox<String> distributionType;
     public Label paramOneName;
@@ -44,18 +47,18 @@ public class SimulationTabPageController extends Agent{
     public TextField targetFlex;
     public TextField targetSurface;
 
-    public TextField deltaTemperature;
+    public TextField temperature;
     public TextField mass;
     public TextField volume;
 
-    public TextField stiffness;
+    public TextField deltaTemperature;
     private ToggleGroup bucketSize;
     public RadioButton bucketAuto;
     public RadioButton bucketSmall;
     public RadioButton bucketMedium;
     public RadioButton bucketHigh;
 
-    public TextField flexibility;
+//    public TextField flexibility;
 
     private DistributionParams distributionConstructorParams;
 
@@ -89,30 +92,44 @@ public class SimulationTabPageController extends Agent{
 
     @FXML
     private void onRunButtonClick(ActionEvent event) throws ControllerException, InterruptedException {
+        try{
+            if(!simulationsCount.getText().matches(numberRegexp))
+                return;
+            Integer amount = Integer.parseInt(simulationsCount.getText());
+            String typeName = distributionType.getSelectionModel().getSelectedItem();
 
-        Integer amount = Integer.parseInt(simulationsCount.getText());
-        String typeName = distributionType.getSelectionModel().getSelectedItem();
+            //TARGET
+            if(!targetMaxTemperature.getText().matches(numberRegexp))
+                return;
+            Double _targetMaxTemp = Double.parseDouble(targetMaxTemperature.getText());
+            if(!targetFlex.getText().matches(numberRegexp))
+                return;
+            Double _targetFlex = Double.parseDouble(targetFlex.getText());
+            if(!targetSurface.getText().matches(numberRegexp))
+                return;
+            Double _targetSurface = Double.parseDouble(targetSurface.getText());
 
-        //TARGET
-        Double _targetMaxTemp = Double.parseDouble(targetMaxTemperature.getText());
-        Double _targetFlex = Double.parseDouble(targetFlex.getText());
-        Double _targetSurface = Double.parseDouble(targetSurface.getText());
 
-        //STEP1
-        Double _deltaTemperature = Double.parseDouble(deltaTemperature.getText());
-        Double _mass = Double.parseDouble(mass.getText());
-        Double _volume = Double.parseDouble(volume.getText());
+            //STEP1
+            Double _temperature = Double.parseDouble(temperature.getText());
+            Double _mass = Double.parseDouble(mass.getText());
+            Double _volume = Double.parseDouble(volume.getText());
 
-        //STEP2
-        Double _stiffness = Double.parseDouble(stiffness.getText()); // range
+            //STEP2
+            Double _deltaTemperature = Double.parseDouble(deltaTemperature.getText()); // range
 
-        //STEP3
-        Double _flexibility = Double.parseDouble(flexibility.getText()); // range
+            AgentController ac = MainContainer.cc.getAgent("UI-agent");
+            InterfaceUI uiObj = ac.getO2AInterface(InterfaceUI.class);
+            Double wjp = uiObj.runProcess(_targetMaxTemp,_targetFlex,_targetSurface, typeName,_deltaTemperature,_volume,_mass);
+            logger.debug("Process sucessfull! Obtained WJP = " + wjp);
+        }
+        catch(NumberFormatException e){
+            System.out.println("Parse exception" + e);
+            return;
+        }
+//        if(amount)
 
-        AgentController ac = MainContainer.cc.getAgent("UI-agent");
-        InterfaceUI uiObj = ac.getO2AInterface(InterfaceUI.class);
-        Double wjp = uiObj.runProcess(_targetMaxTemp,_targetFlex,_targetSurface, typeName,_deltaTemperature,_volume,_mass);
-        logger.debug("Process sucessfull! Obtained WJP = " + wjp);
+
         /*
         ACLMessage msgProcessStart = new ACLMessage(1);
         msgProcessStart.setContent("lol");
@@ -222,13 +239,13 @@ public class SimulationTabPageController extends Agent{
         targetMaxTemperature.setText("400");
         targetFlex.setText("270");
         targetSurface.setText("1000");
-        deltaTemperature.setText("1900.0");
+        temperature.setText("1900.0");
         mass.setText("16000.0");
         volume.setText("2.0");
         bucketAuto.setSelected(true);
 
-        stiffness.setText("0");
-        flexibility.setText("0");
+        deltaTemperature.setText("0");
+//        flexibility.setText("0");
     }
 
     private static class TextAreaOutputStream extends OutputStream {
