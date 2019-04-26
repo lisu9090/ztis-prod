@@ -2,6 +2,7 @@ package pl.edu.agh.agents;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -10,14 +11,10 @@ import pl.edu.agh.productionmodel.ProductionProcess;
 import pl.edu.agh.random.*;
 
 import java.util.ArrayList;
+import org.json.JSONObject;
 
 public class ProcessAgent extends Agent {
-
-
     String [] processParameters;
-    protected void startProcess(){
-
-    }
 
     protected void setup()
     {
@@ -85,29 +82,43 @@ public class ProcessAgent extends Agent {
                         }
                     }
                 }
-
-                /*
-                ProductionProcess process = new ProductionProcess(400.0, 1000.0, 270.0); //instancja processu z zainicjalizowanymi docelowymi parametrami
-
-                //Ustawaimy zakresy przedzialow losowania
-                process.setGeneratorRange(new GeneratorRange.Builder()
-                        .temperature(60.0)
-                        .volume(0.05)
-                        .mass(100.0)
-                        .stiffness(0.1)
-                        .amount(1.0)
-                        .surface(1.0)
-                        .build());
-                process.setGenerator(new NomiGen());
-
-                try {
-                    Double wjp = process.runProcess(1900.0, 2.0, 16000.0);
-                } catch (Exception e) {
-                    e.printStackTrace();
-
-                }
-                */
                 block();
+            }
+        });
+        
+        addBehaviour(new CyclicBehaviour(this)
+        {
+            public void action()
+            {
+                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+                ACLMessage req = myAgent.receive(mt);
+                JSONObject params = new JSONObject(req.getContent());
+                runSimulations(params);
+                send(req.createReply());
+                block();
+            }
+        });
+    }
+    
+    private void runSimulations(JSONObject params){
+    
+        //parse params from json
+        //add behaviour which will run simulations
+        addBehaviour(new Behaviour() {
+            private int step = 0;
+            private boolean stop = false;
+            @Override
+            public void action() {
+                //get pause || stop messages
+                //if stop set stop var and return
+                //run if !pause
+                //runProcess(params);
+                step++;
+            }
+
+            @Override
+            public boolean done() {
+                return true; //step >=params.noSim || stop
             }
         });
     }

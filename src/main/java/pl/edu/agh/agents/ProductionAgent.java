@@ -14,11 +14,10 @@ import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
-
 public class ProductionAgent extends Agent {
     private ArrayList<AID> processAgents = new ArrayList<>();
     private ArrayList<AID> systemAgents = new ArrayList<>();
-
+   
     private AID createProcess(){
         ContainerController cc = getContainerController();
         String processNickname = "Process-agent"+Integer.toString(processAgents.size());

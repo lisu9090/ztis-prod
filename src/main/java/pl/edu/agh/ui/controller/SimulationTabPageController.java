@@ -16,9 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.edu.agh.Main;
 import pl.edu.agh.agents.InterfaceUI;
-import pl.edu.agh.agents.UIAgent;
 import pl.edu.agh.parameter.GeneratorRange;
 import pl.edu.agh.productionmodel.ProductionProcess;
 import pl.edu.agh.random.*;
@@ -28,13 +26,11 @@ import pl.edu.agh.ui.log.appender.StaticOutputStreamAppender;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class SimulationTabPageController extends Agent{
+public class SimulationTabPageController{
 
     private final static Logger logger = LoggerFactory.getLogger(SimulationTabPageController.class);
-    private static final String numberRegexp = "\\d*";
+    private static final String numberRegexp = "^[0-9]*(\\.[0-9]*)?$";
     
     public TextField simulationsCount;
     public ChoiceBox<String> distributionType;
@@ -57,6 +53,11 @@ public class SimulationTabPageController extends Agent{
     public RadioButton bucketSmall;
     public RadioButton bucketMedium;
     public RadioButton bucketHigh;
+    
+    public Button stopButton;
+    public Button pauseButton;
+    public Button resetButton;
+    public Button runButton;
 
 //    public TextField flexibility;
 
@@ -88,98 +89,25 @@ public class SimulationTabPageController extends Agent{
         StaticOutputStreamAppender.setStaticOutputStream(os);
 
         setDefaultProcessValues();
-    }
-
-    @FXML
-    private void onRunButtonClick(ActionEvent event) throws ControllerException, InterruptedException {
+        
         try{
-            if(!simulationsCount.getText().matches(numberRegexp))
-                return;
-            Integer amount = Integer.parseInt(simulationsCount.getText());
-            String typeName = distributionType.getSelectionModel().getSelectedItem();
-
-            //TARGET
-            if(!targetMaxTemperature.getText().matches(numberRegexp))
-                return;
-            Double _targetMaxTemp = Double.parseDouble(targetMaxTemperature.getText());
-            if(!targetFlex.getText().matches(numberRegexp))
-                return;
-            Double _targetFlex = Double.parseDouble(targetFlex.getText());
-            if(!targetSurface.getText().matches(numberRegexp))
-                return;
-            Double _targetSurface = Double.parseDouble(targetSurface.getText());
-
-
-            //STEP1
-            Double _temperature = Double.parseDouble(temperature.getText());
-            Double _mass = Double.parseDouble(mass.getText());
-            Double _volume = Double.parseDouble(volume.getText());
-
-            //STEP2
-            Double _deltaTemperature = Double.parseDouble(deltaTemperature.getText()); // range
-
             AgentController ac = MainContainer.cc.getAgent("UI-agent");
             InterfaceUI uiObj = ac.getO2AInterface(InterfaceUI.class);
-            Double wjp = uiObj.runProcess(_targetMaxTemp,_targetFlex,_targetSurface, typeName,_deltaTemperature,_volume,_mass);
-            logger.debug("Process sucessfull! Obtained WJP = " + wjp);
+            uiObj.setUIControllerRef(this);
         }
-        catch(NumberFormatException e){
-            System.out.println("Parse exception" + e);
-            return;
+        catch(Exception e){
+            System.out.println("UI reference passing failure" + e);
         }
-//        if(amount)
-
-
-        /*
-        ACLMessage msgProcessStart = new ACLMessage(1);
-        msgProcessStart.setContent("lol");
-        msgProcessStart.addReceiver(new AID( "Process-agent", AID.ISLOCALNAME));
-        uiObj.send(msgProcessStart);
-
-
-        ProductionProcess process = new ProductionProcess(_targetMaxTemp, _targetFlex, _targetSurface); //instancja processu z zainicjalizowanymi docelowymi parametrami
-        //Ustawaimy zakresy przedzialow losowania
-        process.setGeneratorRange(new GeneratorRange.Builder()
-                .temperature(60.0)
-                .volume(0.05)
-                .mass(100.0)
-                .stiffness(0.1)
-                .amount(1.0)
-                .surface(1.0)
-                .build());
-        process.setGenerator(resolveFromName(typeName));
-        try {
-            //Double wjp = process.runProcess(_deltaTemperature, _volume, _mass);
-            //Double wjp = process.runProcess(1900.0, 2.0, 16000.0); //uruchom caly proces z domyslnymi wartosciami i zwroc wjp
-            //logger.debug("Process sucessfull! Obtained WJP = " + wjp);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
-        */
     }
-
-    private IDistGenerator resolveFromName(String typeName) {
-        if(typeName.equals(GenNames.NOMINAL.name())) {
-            return new NomiGen();
-        } else if(typeName.equals(GenNames.GAUSS.name())) {
-            return new GaussGen();
-        } else if(typeName.equals(GenNames.GEOMETRICAL.name())) {
-            if(distributionConstructorParams.getParamOne() != null) {
-                return new GeomGen(Double.parseDouble(distributionConstructorParams.getParamOne()));
-            }
-            return new GeomGen();
-        } else if(typeName.equals(GenNames.POISSON.name())) {
-            if(distributionConstructorParams.getParamOne() != null) {
-                return new PoissonGen(Double.parseDouble(distributionConstructorParams.getParamOne()));
-            }
-            return new PoissonGen();
-        } else {
-            if(distributionConstructorParams.getParamOne() != null && distributionConstructorParams.getParamTwo() != null) {
-                return new BetaGen(Double.parseDouble(distributionConstructorParams.getParamOne()), Double.parseDouble(distributionConstructorParams.getParamTwo()));
-            }
-            return new BetaGen();
-        }
+    
+    public String getBucketSize(){
+        if(bucketSmall.isSelected())
+            return "0.02";
+        else if(bucketMedium.isSelected())
+            return "0.2";
+        else if(bucketSmall.isSelected())
+            return "1.0";
+        return "0"; //auto
     }
 
     @FXML

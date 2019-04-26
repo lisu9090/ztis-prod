@@ -85,6 +85,15 @@ public class DatabaseTabPageController {
         observableList = FXCollections.observableArrayList(prepareData());
         databaseView.setItems(observableList);
         databaseView.getColumns().addAll(pidColumn, stageMultiColumn, outputMultiColumn);
+        
+        try{
+            AgentController ac = MainContainer.cc.getAgent("UI-agent");
+            InterfaceUI uiObj = ac.getO2AInterface(InterfaceUI.class);
+            uiObj.setUIControllerRef(this);
+        }
+        catch(Exception e){
+            System.out.println("UI reference passing failure" + e);
+        }
 
     }
 
