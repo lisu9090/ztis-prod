@@ -190,4 +190,7 @@ public class SimulationTabPageController{
         }
     }
 
+    public void printToConsole(String msg){
+        textAreaConsole.appendText("\n" + msg);
+    }
 }

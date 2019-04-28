@@ -37,41 +37,56 @@ public class UIAgent extends Agent implements InterfaceUI{
     {
         args = getArguments();
 
+//        addBehaviour(new CyclicBehaviour(this)
+//        {
+//            public void action()
+//            {
+//                ArrayList<MessageTemplate> templates = new ArrayList<>();
+//                templates.add(MessageTemplate.MatchPerformative(AgentMessages.CHECK_AGENT));
+//                templates.add(MessageTemplate.MatchPerformative(1));
+//                ACLMessage [] checkMsg = new ACLMessage[templates.size()];
+//
+//                int counter=0;
+//                for(MessageTemplate checkState: templates){
+//                    checkMsg[counter++] = receive(checkState);
+//                }
+//
+//                for(ACLMessage msg: checkMsg){
+//                    if(msg != null){
+//                        //confirming that agent is working
+//                        if (msg.getPerformative() == AgentMessages.CHECK_AGENT) {
+//                            ACLMessage reply = new ACLMessage(AgentMessages.CHECK_AGENT);
+//                            reply.setContent("success");
+//                            reply.addReceiver(new AID(args[0].toString(), AID.ISLOCALNAME));
+//                            send(reply);
+//                        }
+//
+//                        else if (msg.getPerformative() == 1){
+//                            System.out.println(msg.getContent());
+//                        }
+//                    }
+//
+//                block();
+//                }
+//            }
+//        });
+        
         addBehaviour(new CyclicBehaviour(this)
         {
-            public void action()
-            {
-                ArrayList<MessageTemplate> templates = new ArrayList<>();
-                templates.add(MessageTemplate.MatchPerformative(AgentMessages.CHECK_AGENT));
-                templates.add(MessageTemplate.MatchPerformative(1));
-                ACLMessage [] checkMsg = new ACLMessage[templates.size()];
-
-                int counter=0;
-                for(MessageTemplate checkState: templates){
-                    checkMsg[counter++] = receive(checkState);
+            public void action(){
+                MessageTemplate resultTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+                ACLMessage msg = receive(resultTemplate);
+                if(msg != null)
+                {
+                    simulationTabPageController.printToConsole(msg.getContent());
                 }
-
-                for(ACLMessage msg: checkMsg){
-                    if(msg != null){
-                        //confirming that agent is working
-                        if (msg.getPerformative() == AgentMessages.CHECK_AGENT) {
-                            ACLMessage reply = new ACLMessage(AgentMessages.CHECK_AGENT);
-                            reply.setContent("success");
-                            reply.addReceiver(new AID(args[0].toString(), AID.ISLOCALNAME));
-                            send(reply);
-                        }
-
-                        else if (msg.getPerformative() == 1){
-                            System.out.println(msg.getContent());
-                        }
-                    }
-
-                block();
-                }
+                else
+                    block();
             }
         });
     }
         
+    @Override
     public void setUIControllerRef(SimulationTabPageController instance){
         simulationTabPageController = instance;
         simulationTabPageController.runButton.setOnAction((ActionEvent t) -> {
@@ -84,64 +99,65 @@ public class UIAgent extends Agent implements InterfaceUI{
         });
     }
     
+    @Override
     public void setUIControllerRef(DatabaseTabPageController instance){
         databaseTabPageController = instance;
     }
 
     //db access start for GUI
-    public List<ProcessJson> startQuery() {
-        while(!AgentQuery());
-        dbQueryFinished = false;
-        return processes;
-    }
-
-    public boolean AgentQuery(){
-        addBehaviour(new Behaviour() {
-            @Override
-            public void action() {
-                switch(DBQueryStartStep) {
-                    case (0):
-                        ACLMessage msgQueryInit = new ACLMessage(AgentMessages.GET_PROCESS_IDS);
-                        msgQueryInit.setContent("");
-                        msgQueryInit.addReceiver(new AID(args[0].toString(), AID.ISLOCALNAME));
-                        send(msgQueryInit);
-                        DBQueryStartStep = 1;
-                    case (1):
-                        MessageTemplate msgTmp = MessageTemplate.MatchPerformative(AgentMessages.GET_PROCESS_IDS_ACK);
-                        ACLMessage msgReceive = receive(msgTmp);
-                        processes = new ArrayList<>();
-                        if(msgReceive!=null){
-                            System.out.println("Hmm");
-                            String [] stringPIDs = msgReceive.getContent().split(" ");
-                            long []longPIDs = new long[stringPIDs.length];
-                            for(int i = 0; i<stringPIDs.length;i++){
-                                ProcessJson process = new ProcessJson();
-                                process.setId(Long.parseLong(stringPIDs[i]));
-                                processes.add(process);
-                            }
-                            dbQueryFinished = true;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                block();
-            }
-
-            @Override
-            public boolean done() {
-                return dbQueryFinished;
-            }
-        });
-
-        return dbQueryFinished;
-    }
+//    public List<ProcessJson> startQuery() {
+//        while(!AgentQuery());
+//        dbQueryFinished = false;
+//        return processes;
+//    }
+//
+//    public boolean AgentQuery(){
+//        addBehaviour(new Behaviour() {
+//            @Override
+//            public void action() {
+//                switch(DBQueryStartStep) {
+//                    case (0):
+//                        ACLMessage msgQueryInit = new ACLMessage(AgentMessages.GET_PROCESS_IDS);
+//                        msgQueryInit.setContent("");
+//                        msgQueryInit.addReceiver(new AID(args[1].toString(), AID.ISLOCALNAME));
+//                        send(msgQueryInit);
+//                        DBQueryStartStep = 1;
+//                    case (1):
+//                        MessageTemplate msgTmp = MessageTemplate.MatchPerformative(AgentMessages.GET_PROCESS_IDS_ACK);
+//                        ACLMessage msgReceive = receive(msgTmp);
+//                        processes = new ArrayList<>();
+//                        if(msgReceive!=null){
+//                            System.out.println("Hmm");
+//                            String [] stringPIDs = msgReceive.getContent().split(" ");
+//                            long []longPIDs = new long[stringPIDs.length];
+//                            for(int i = 0; i<stringPIDs.length;i++){
+//                                ProcessJson process = new ProcessJson();
+//                                process.setId(Long.parseLong(stringPIDs[i]));
+//                                processes.add(process);
+//                            }
+//                            dbQueryFinished = true;
+//                        }
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                block();
+//            }
+//
+//            @Override
+//            public boolean done() {
+//                return dbQueryFinished;
+//            }
+//        });
+//
+//        return dbQueryFinished;
+//    }
     
     private void sendRunSimReq(){
         try{
             JSONObject simParams = new JSONObject();
             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-            msg.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
+            msg.addReceiver((AID)args[1]);
 
             if(!simulationTabPageController.simulationsCount.getText().matches(numberRegexp) || simulationTabPageController.simulationsCount.getText().length()<1)
                 return;

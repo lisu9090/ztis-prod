@@ -420,7 +420,7 @@
                                         <bottom>
                                             <HBox fillHeight="false" prefWidth="740.0" BorderPane.alignment="CENTER">
                                                 <children>
-                                                    <Button x:id="stopButton" mnemonicParsing="false" prefWidth="75.0" text="Stop">
+                                                    <Button fx:id="stopButton" mnemonicParsing="false" prefWidth="75.0" text="Stop">
                                                         <HBox.margin>
                                                             <Insets bottom="10.0" right="10.0" top="10.0" />
                                                         </HBox.margin>

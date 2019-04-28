@@ -11,15 +11,20 @@ import pl.edu.agh.productionmodel.ProductionProcess;
 import pl.edu.agh.random.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONObject;
+import pl.edu.agh.parameter.ProdInputModel;
+import pl.edu.agh.parameter.Temperature;
 
 public class ProcessAgent extends Agent {
     String [] processParameters;
-
+    private ProdInputModel prodModel;
+    private List<AID> processResultReceivers = new ArrayList();
+    private Object [] args;
+    
     protected void setup()
     {
-        Object [] args = getArguments();
-
+        args = getArguments();
         addBehaviour(new CyclicBehaviour(this)
         {
             public void action()
@@ -92,35 +97,83 @@ public class ProcessAgent extends Agent {
             {
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
                 ACLMessage req = myAgent.receive(mt);
-                JSONObject params = new JSONObject(req.getContent());
-                runSimulations(params);
-                send(req.createReply());
-                block();
+                if(req != null){
+                    JSONObject params = new JSONObject(req.getContent());
+                    runSimulations(params);
+                    send(req.createReply());   
+                }
+                else{
+                    block();
+                }
             }
         });
     }
     
     private void runSimulations(JSONObject params){
-    
-        //parse params from json
-        //add behaviour which will run simulations
-        addBehaviour(new Behaviour() {
+        prodModel = new ProdInputModel(
+                params.getInt("noSim"), params.getString("generator"), params.getDouble("targetMaxTemperature"), 
+                params.getDouble("targetFlex"), params.getDouble("targetSurface"));
+        
+        prodModel.inputTemperature = params.getString("temperature").equals("") ? null : params.getDouble("temperature");
+        prodModel.inputMass = params.getString("mass").equals("") ? null : params.getDouble("mass");
+        prodModel.inputVolume = params.getString("volume").equals("") ? null : params.getDouble("volume");
+        prodModel.deltaTemp = params.getString("deltaTemperature").equals("") ? null : params.getDouble("deltaTemperature");
+        prodModel.bucketSize = params.getString("bucketSize").equals("") ? null : params.getDouble("bucketSize");
+        
+        addBehaviour(new Behaviour(this) {
             private int step = 0;
             private boolean stop = false;
+            private MessageTemplate stopTemplate = MessageTemplate.MatchContent("STOP");
+            private MessageTemplate pauseTemplate = MessageTemplate.MatchContent("PAUSE");
+                    
             @Override
             public void action() {
-                //get pause || stop messages
-                //if stop set stop var and return
-                //run if !pause
-                //runProcess(params);
+                ACLMessage shouldStop = receive(stopTemplate);
+                ACLMessage shouldPause = receive(pauseTemplate);
+                if(shouldStop != null){
+                    ACLMessage res = shouldStop.createReply();
+                    res.setContent("STOP ACK");
+                    send(res);
+                    stop = true;
+                    return;
+                }
+                if(shouldPause != null){
+                    ACLMessage res = shouldStop.createReply();
+                    res.setContent("STOP ACK");
+                    send(res);
+                    block();
+                    //do poprawienia
+                }
+                
+                ACLMessage processResult = new ACLMessage(ACLMessage.INFORM);
+//                for(AID agent : processResultReceivers){
+//                    processResult.addReceiver(agent);
+//                }
+                processResult.addReceiver((AID)args[0]);
+                processResult.setContent("Simulation no: " + step + " - " + runProcess());
+                send(processResult);
                 step++;
             }
 
             @Override
             public boolean done() {
-                return true; //step >=params.noSim || stop
+                return step >= prodModel.noSim || stop;
             }
         });
+    }
+    
+    private String runProcess(){
+        String outputLog = "";
+        //process object
+        ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
+        try{
+            //add rest of params (gen, gen params) and asko for help ml agents if some of params are not set.
+            outputLog = "Production compleated! WJP = " + process.runProcess(prodModel.inputTemperature, prodModel.inputMass, prodModel.inputVolume);
+        }
+        catch(Exception e){
+            outputLog = "Production failure! " + e;
+        }
+        return outputLog;
     }
 
     private IDistGenerator resolveFromName(String typeName) {

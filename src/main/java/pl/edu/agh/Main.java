@@ -1,6 +1,8 @@
 package pl.edu.agh;
 
+import jade.core.AID;
 import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -22,15 +24,32 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            AgentController prod = MainContainer.cc.createNewAgent("Production-agent",
-                    "pl.edu.agh.agents.ProductionAgent", null);
-            prod.start();
+            //            AgentController prod = MainContainer.cc.createNewAgent("Production-agent",
+//                    "pl.edu.agh.agents.ProductionAgent", null);
+//            prod.start();
+            
             AgentController rma = MainContainer.cc.createNewAgent("rma", "jade.tools.rma.rma", null);
             rma.start();
+
+            Object [] args = {new AID("UI-agent", AID.ISLOCALNAME), new AID("Process-agent", AID.ISLOCALNAME), new AID("Database-agent", AID.ISLOCALNAME)};
+
+            //initialize UI agent
+            
+            AgentController ui = MainContainer.cc.createNewAgent("UI-agent", "pl.edu.agh.agents.UIAgent", args);
+            ui.start();
+
+            AgentController processAgent = MainContainer.cc.createNewAgent("Process-agent", "pl.edu.agh.agents.ProcessAgent", args);
+            processAgent.start();
+            
+            //initialize database agent
+            AgentController database = MainContainer.cc.createNewAgent("Database-agent", "pl.edu.agh.agents.DatabaseAgent", args);
+            database.start();
+
         } catch (StaleProxyException e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-
+        System.out.println("Agents initialized");
 
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
 

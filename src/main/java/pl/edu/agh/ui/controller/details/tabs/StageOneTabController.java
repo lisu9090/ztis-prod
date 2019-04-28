@@ -6,10 +6,10 @@ import pl.edu.agh.db.DBManager;
 import pl.edu.agh.parameter.ParameterJson;
 import pl.edu.agh.parameter.ProductionInput;
 import pl.edu.agh.ui.controller.InputOutputStageRefresh;
-import sun.text.normalizer.Trie;
+//import sun.text.normalizer.Trie;
 
 import java.util.List;
-import java.util.UUID;
+//import java.util.UUID;
 
 public class StageOneTabController implements InputOutputStageRefresh {
 

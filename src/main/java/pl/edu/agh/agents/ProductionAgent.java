@@ -54,35 +54,36 @@ public class ProductionAgent extends Agent {
 
     protected void setup()
     {
-        Object [] args = new Object[1];
-        args[0]=getLocalName();
-        ContainerController cc = getContainerController();
-
-        //initialize UI agent
-        try {
-
-            AgentController ui = cc.createNewAgent("UI-agent",
-                    "pl.edu.agh.agents.UIAgent", args);
-            ui.start();
-            systemAgents.add(new AID("UI-agent", AID.ISLOCALNAME));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-
-        //initialize database agent
-        try {
-            AgentController database = cc.createNewAgent("Database-agent",
-                    "pl.edu.agh.agents.DatabaseAgent", args);
-            database.start();
-            systemAgents.add(new AID("Database-agent", AID.ISLOCALNAME));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-        System.out.println("Agents initialized");
+//        Object [] args = new Object[1];
+//        args[0]=getLocalName();
+//        ContainerController cc = getContainerController();
+//
+//        //initialize UI agent
+//        try {
+//            Object[] args2 = new Object[1];
+//            args2[0] = new AID("Process-agent", AID.ISLOCALNAME);
+//            
+//            AgentController ui = cc.createNewAgent("UI-agent",
+//                    "pl.edu.agh.agents.UIAgent", args2);
+//            ui.start();
+//            systemAgents.add(new AID("UI-agent", AID.ISLOCALNAME));
+//
+//            AgentController processAgent = cc.createNewAgent("Process-agent",
+//                    "pl.edu.agh.agents.ProcessAgent", args);
+//            processAgent.start();
+//            systemAgents.add((AID)args2[0]);
+//            
+//        //initialize database agent
+//            AgentController database = cc.createNewAgent("Database-agent",
+//                    "pl.edu.agh.agents.DatabaseAgent", args);
+//            database.start();
+//            systemAgents.add(new AID("Database-agent", AID.ISLOCALNAME));
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+//        }
+//        System.out.println("Agents initialized");
 
         addBehaviour(new CyclicBehaviour(this)
         {
