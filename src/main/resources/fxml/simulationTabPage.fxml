@@ -430,12 +430,12 @@
                                                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                                         </HBox.margin>
                                                     </Button>
-                                                    <Button fx:id="resetButton" mnemonicParsing="false"  prefWidth="75.0" text="Reset">
-                                                        <!--onAction="#onResetButtonClick"-->
+<!--                                                    <Button fx:id="resetButton" mnemonicParsing="false"  prefWidth="75.0" text="Reset">
+                                                        onAction="#onResetButtonClick"
                                                         <HBox.margin>
                                                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                                         </HBox.margin>
-                                                    </Button>
+                                                    </Button>-->
                                                     <Pane prefHeight="48.0" prefWidth="345.0" HBox.hgrow="ALWAYS" />
                                                     <Button fx:id="runButton" mnemonicParsing="false" prefWidth="75.0" text="Run">
                                                         <!--onAction="#onRunButtonClick"--> 

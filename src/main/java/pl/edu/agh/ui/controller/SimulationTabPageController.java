@@ -56,7 +56,7 @@ public class SimulationTabPageController{
     
     public Button stopButton;
     public Button pauseButton;
-    public Button resetButton;
+//    public Button resetButton;
     public Button runButton;
 
 //    public TextField flexibility;

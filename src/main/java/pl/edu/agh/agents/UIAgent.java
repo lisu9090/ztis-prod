@@ -97,6 +97,22 @@ public class UIAgent extends Agent implements InterfaceUI{
                     }
                 });
         });
+        simulationTabPageController.stopButton.setOnAction((ActionEvent event) -> {
+            addBehaviour(new OneShotBehaviour(this) {
+                    @Override
+                    public void action() {
+                       sendStopSimReq();
+                    }
+                });
+        });
+        simulationTabPageController.pauseButton.setOnAction((ActionEvent event) -> {
+            addBehaviour(new OneShotBehaviour(this) {
+                    @Override
+                    public void action() {
+                       sendPauseSimReq();
+                    }
+                });
+        });
     }
     
     @Override
@@ -190,6 +206,14 @@ public class UIAgent extends Agent implements InterfaceUI{
         catch(NumberFormatException e){
             System.out.println("Sending run process req err " + e);
         }
+    }
+    
+    private void sendStopSimReq(){
+        
+    }
+    
+    private void sendPauseSimReq(){
+        
     }
 
 //    //process run interface for GUI
