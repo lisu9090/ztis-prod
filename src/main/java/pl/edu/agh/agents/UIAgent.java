@@ -180,6 +180,9 @@ public class UIAgent extends Agent implements InterfaceUI{
             simParams.put("noSim", simulationTabPageController.simulationsCount.getText());
             simParams.put("generator", simulationTabPageController.distributionType.getSelectionModel().getSelectedItem());
 
+            simParams.put("param1", simulationTabPageController.paramOneValue.getText());
+            simParams.put("param2", simulationTabPageController.paramTwoValue.getText());
+
             //TARGET
             if(!simulationTabPageController.targetMaxTemperature.getText().matches(numberRegexp) || simulationTabPageController.targetMaxTemperature.getText().length()<1)
                 return;
@@ -209,11 +212,11 @@ public class UIAgent extends Agent implements InterfaceUI{
     }
     
     private void sendStopSimReq(){
-        
+        System.out.println("Sending Stop request..");
     }
     
     private void sendPauseSimReq(){
-        
+        System.out.println("Sending Pause request..");
     }
 
 //    //process run interface for GUI

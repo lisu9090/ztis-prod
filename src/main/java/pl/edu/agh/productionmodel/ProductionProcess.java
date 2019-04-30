@@ -9,6 +9,7 @@ import pl.edu.agh.random.NomiGen;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.json.JSONObject;
 
 public class ProductionProcess {
 
@@ -31,6 +32,10 @@ public class ProductionProcess {
 
     private IDistGenerator generator;
     private Long pid;
+    
+    private boolean firstStepCopleated = false;
+    private boolean secondStepCopleated = false;
+    private boolean thirdStepCopleated = false;
 
     private ProductionProcess() {
         pid = System.currentTimeMillis();
@@ -58,8 +63,38 @@ public class ProductionProcess {
     public void setGenerator(IDistGenerator generator) {
         this.generator = generator;
     }
+    
+    public JSONObject paramsToJson(){
+        JSONObject ret = new JSONObject();
+        ret.put("timestamp", System.currentTimeMillis());
+        ret.put("pid", pid);
+        ret.put("temperature", temperature);
+        ret.put("volume", volume);
+        ret.put("mass", mass);
+        ret.put("stiffness", stiffness);
+        ret.put("amount", amount);
+        ret.put("size", size);
+        ret.put("surface", surface);
+        ret.put("flexibility", flexibility);
+        ret.put("outputTemperature", outputTemperature);
+        ret.put("outputSurface", outputSurface);
+        ret.put("outputFlexibility", outputFlexibility);
+        String wjp;
+        try{
+            wjp = computeWJP().toString();
+        }
+        catch(Exception e){
+            wjp = "null";
+        }
+        ret.put("wjp", wjp);
+        
+        return ret;
+    }
 
-    private Double computeWJP() {
+    public Double computeWJP() throws Exception{
+        if(!firstStepCopleated || !secondStepCopleated || !thirdStepCopleated)
+            throw new Exception("Process has not been compleated!");
+        
         if (temperature.getValue() <= outputTemperature.getValue()) {
             return (Math.abs(outputSurface.getValue() - surface.getValue())
                     + Math.abs(outputFlexibility.getValue() - flexibility.getValue())) * amount.getValue();
@@ -68,12 +103,22 @@ public class ProductionProcess {
         return (Math.abs(outputTemperature.getValue() - temperature.getValue()) + Math.abs(outputSurface.getValue() - surface.getValue())
                 + Math.abs(outputFlexibility.getValue() - flexibility.getValue())) * amount.getValue();
     }
+    
+//        private void saveCurrentStage(int stageNum) {
+//        DBManager.getINSTANCE()
+//                .saveProductionInput(new ProductionInput(
+//                        System.currentTimeMillis(), stageNum, pid,
+//                        Stream.of(temperature, flexibility, surface, stiffness, amount, mass, volume)
+//                                .map(it -> it.toJson(pid, stageNum))
+//                                .collect(Collectors.toList())
+//                                .toArray(new ParameterJson[7])));
+//    }
 
-    private void firstStep(Double temp, Double vol, Double mass) throws Exception {
+    public void firstStep(Double temp, Double vol, Double mass) throws Exception {
         temperature.setValue(temp);
         volume.setValue(vol);
         this.mass.setValue(mass);
-        saveCurrentStage(1);
+//        saveCurrentStage(1);
         if (generator == null) {
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
         }
@@ -93,20 +138,11 @@ public class ProductionProcess {
             throw new Exception("Mass is out of range! Process hes been stopped.");
         }
 
+        firstStepCopleated = true;
     }
 
-    private void saveCurrentStage(int stageNum) {
-        DBManager.getINSTANCE()
-                .saveProductionInput(new ProductionInput(
-                        System.currentTimeMillis(), stageNum, pid,
-                        Stream.of(temperature, flexibility, surface, stiffness, amount, mass, volume)
-                                .map(it -> it.toJson(pid, stageNum))
-                                .collect(Collectors.toList())
-                                .toArray(new ParameterJson[7])));
-    }
-
-    private void secondStep(Double deltaTemp) throws Exception {
-        saveCurrentStage(2);
+    public void secondStep(Double deltaTemp) throws Exception {
+//        saveCurrentStage(2);
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
 
@@ -132,10 +168,12 @@ public class ProductionProcess {
         //amount.setValue(generator.generate(Math.floor(volume.getValue() / size.getValue()) , amount.getGeneratorRange()));
         if (!amount.isCorrectValue())
             throw new Exception("Amount is out of range! Process hes been stopped.");
+        
+        secondStepCopleated = true; 
     }
 
-    private void thirdStep() throws Exception {
-        saveCurrentStage(3);
+    public void thirdStep() throws Exception {
+//        saveCurrentStage(3);
 
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
@@ -151,6 +189,8 @@ public class ProductionProcess {
         flexibility.setValue(generator.generate((stiffness.getValue() * temperature.getValue()), generatorRange.getFlexibilityRange()));
         if (!flexibility.isCorrectValue())
             throw new Exception("Flexibility is out of range! Process hes been stopped.");
+        
+        thirdStepCopleated = true;
     }
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
