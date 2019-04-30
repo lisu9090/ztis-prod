@@ -82,7 +82,7 @@ public class DatabaseTabPageController {
 
         pidColumn.setSortType(TableColumn.SortType.DESCENDING);
 
-        observableList = FXCollections.observableArrayList(prepareData());
+//        observableList = FXCollections.observableArrayList(prepareData());
         databaseView.setItems(observableList);
         databaseView.getColumns().addAll(pidColumn, stageMultiColumn, outputMultiColumn);
         
@@ -97,43 +97,43 @@ public class DatabaseTabPageController {
 
     }
 
-    private List<ProcessDetailsWrapper> prepareData(){
-        List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
-
-        AgentController ac = null;
-        InterfaceUI uiObj = null;
-        try {
-            ac = MainContainer.cc.getAgent("UI-agent");
-            uiObj = ac.getO2AInterface(InterfaceUI.class);
-        } catch (ControllerException e) {
-            e.printStackTrace();
-        }
-
-        List<ProcessJson> processes = DBManager.getINSTANCE().findAllProcesses();
-
-        for (ProcessJson p : processes) {
-            System.out.println("Process ID: " + p.getId());
-            Long pid = p.getId();
-            Double wjp = Double.NaN, temperature = Double.NaN, flexibility = Double.NaN, surface = Double.NaN;
-            boolean[] stages = new boolean[]{false, false, false};
-
-            List<ProductionInput> inputs = DBManager.getINSTANCE().findAllInputForPid(p.getId());
-            for(int i=0; i<inputs.size(); i++) {
-                stages[i] = inputs.get(i).getStage() != null;
-            }
-
-            List<ProductionOutput> outputs = DBManager.getINSTANCE().findAllOutputForPid(p.getId());
-            for(ProductionOutput po : outputs) {
-                wjp = po.getWjp();
-                System.out.println(wjp);
-                temperature = (Double) po.getTemperature().toObject().getValue();
-                flexibility = (Double) po.getFlexibility().toObject().getValue();
-                surface = (Double) po.getSurface().toObject().getValue();
-            }
-            tableElements.add(new ProcessDetailsWrapper(pid, stages[0], stages[1], stages[2], temperature, flexibility, surface, wjp));
-        }
-        return tableElements;
-    }
+//    private List<ProcessDetailsWrapper> prepareData(){
+//        List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
+//
+//        AgentController ac = null;
+//        InterfaceUI uiObj = null;
+//        try {
+//            ac = MainContainer.cc.getAgent("UI-agent");
+//            uiObj = ac.getO2AInterface(InterfaceUI.class);
+//        } catch (ControllerException e) {
+//            e.printStackTrace();
+//        }
+//
+//        List<ProcessJson> processes = DBManager.getINSTANCE().findAllProcesses();
+//
+//        for (ProcessJson p : processes) {
+//            System.out.println("Process ID: " + p.getId());
+//            Long pid = p.getId();
+//            Double wjp = Double.NaN, temperature = Double.NaN, flexibility = Double.NaN, surface = Double.NaN;
+//            boolean[] stages = new boolean[]{false, false, false};
+//
+//            List<ProductionInput> inputs = DBManager.getINSTANCE().findAllInputForPid(p.getId());
+//            for(int i=0; i<inputs.size(); i++) {
+//                stages[i] = inputs.get(i).getStage() != null;
+//            }
+//
+//            List<ProductionOutput> outputs = DBManager.getINSTANCE().findAllOutputForPid(p.getId());
+//            for(ProductionOutput po : outputs) {
+//                wjp = po.getWjp();
+//                System.out.println(wjp);
+//                temperature = (Double) po.getTemperature().toObject().getValue();
+//                flexibility = (Double) po.getFlexibility().toObject().getValue();
+//                surface = (Double) po.getSurface().toObject().getValue();
+//            }
+//            tableElements.add(new ProcessDetailsWrapper(pid, stages[0], stages[1], stages[2], temperature, flexibility, surface, wjp));
+//        }
+//        return tableElements;
+//    }
 
 
 
@@ -152,7 +152,7 @@ public class DatabaseTabPageController {
     public void onRefreshButtonClick() {
         databaseView.getItems().removeAll(observableList);
         observableList.removeAll();
-        observableList.addAll(prepareData());
+//        observableList.addAll(prepareData());
         databaseView.setItems(observableList);
     }
 

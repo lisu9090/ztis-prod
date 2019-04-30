@@ -13,6 +13,7 @@ import pl.edu.agh.random.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONObject;
+import pl.edu.agh.parameter.Parameter;
 import pl.edu.agh.parameter.ProdInputModel;
 import pl.edu.agh.parameter.Temperature;
 
@@ -100,7 +101,9 @@ public class ProcessAgent extends Agent {
                 if(req != null){
                     JSONObject params = new JSONObject(req.getContent());
                     runSimulations(params);
-                    send(req.createReply());   
+                    ACLMessage res = req.createReply();
+                    res.setContent("START ACK");
+                    send(res);   
                 }
                 else{
                     block();
@@ -144,46 +147,80 @@ public class ProcessAgent extends Agent {
                 }
                 if(shouldPause != null){
                     ACLMessage res = shouldPause.createReply();
-                    res.setContent("STOP ACK");
+                    res.setContent("PASUE ACK");
                     send(res);
                     block();
                     //do poprawienia
                 }
                 
+                ProductionProcess result = runProcess();
+                processesJsonList.add(result.paramsToJson());
                 ACLMessage processResult = new ACLMessage(ACLMessage.INFORM);
-//                for(AID agent : processResultReceivers){
-//                    processResult.addReceiver(agent);
-//                }
                 processResult.addReceiver((AID)args[0]);
-                processResult.setContent("Simulation no: " + step + " - " + runProcess(processesJsonList));
+                try{
+                    processResult.setContent("Simulation no: " + step + " - " + result.computeWJP().toString());
+                }
+                catch(Exception e){
+                     processResult.setContent("Failure: " + e);
+                }
                 send(processResult);
                 step++;
             }
 
             @Override
             public boolean done() {
-                return step >= prodModel.noSim || stop;
+                if(step >= prodModel.noSim || stop){
+                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.addReceiver((AID)args[2]);
+                    JSONObject data = new JSONObject();
+                    processesJsonList.forEach((result) -> {
+                        data.put(result.get("pid").toString(), result);
+                    });
+                    msg.setContent(data.toString());
+                    myAgent.send(msg);
+                    
+                    //dodac wiadomosc potwierdzajaca ukonczenie symulacji
+                    
+                    return true;
+                }
+                return false;
             }
         });
     }
-    
-    private String runProcess(List<JSONObject> outputParamsLog){
-        String outputLog;
-        //process object
+ 
+        private ProductionProcess runProcess(){
         ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
         process.setGenerator(prodModel.generator);
         try{
-            //add rest of params (gen, gen params) and ask for help ml agents if some of params are not set.
-            outputLog = "Production compleated! WJP = " + process.runProcess(prodModel.inputTemperature, prodModel.inputMass, prodModel.inputVolume);
-            if(outputParamsLog != null){
-                outputParamsLog.add(process.paramsToJson());
-            }
+            //dodac logike agentow uczacych sie
+            process.firstStep(prodModel.inputTemperature, prodModel.inputVolume, prodModel.inputMass);
+            process.secondStep(1200.0, Parameter.Size.SMALL);
+            process.thirdStep();
         }
         catch(Exception e){
-            outputLog = "Production failure! " + e;
-        }
-        return outputLog;
+            e.printStackTrace();
+            return null;
+        } 
+        return process;
     }
+    
+//    private String runProcess(List<JSONObject> outputParamsLog){
+//        String outputLog;
+//        //process object
+//        ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
+//        process.setGenerator(prodModel.generator);
+//        try{
+//            //add rest of params (gen, gen params) and ask for help ml agents if some of params are not set.
+//            outputLog = "Production compleated! WJP = " + process.runProcess(prodModel.inputTemperature, prodModel.inputMass, prodModel.inputVolume);
+//            if(outputParamsLog != null){
+//                outputParamsLog.add(process.paramsToJson());
+//            }
+//        }
+//        catch(Exception e){
+//            outputLog = "Production failure! " + e;
+//        }
+//        return outputLog;
+//    }
 
 //    private IDistGenerator resolveFromName(String typeName) {
 //        if (typeName.equals(GenNames.NOMINAL.name()))

@@ -39,25 +39,25 @@ public class StageTwoTabController implements InputOutputStageRefresh {
 
     @Override
     public void refresh(Long pid) {
-        List<ProductionInput> pi = DBManager.getINSTANCE().findAllInputForPid(pid);
-        if(pi.size() >= 2) {
-            ParameterJson[] parameterJsons = pi.get(1).getParameters();
-            temperature.setText(parameterJsons[0].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[0].getValue().toString());
-            flexibility.setText(parameterJsons[1].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[1].getValue().toString());
-            surface.setText(parameterJsons[2].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[2].getValue().toString());
-            stiffness.setText(parameterJsons[3].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[3].getValue().toString());
-            amount.setText(parameterJsons[4].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[4].getValue().toString());
-            mass.setText(parameterJsons[5].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[5].getValue().toString());
-            volume.setText(parameterJsons[6].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[6].getValue().toString());
-        } else {
-            temperature.setText(Double.toString(Double.NaN));
-            flexibility.setText(Double.toString(Double.NaN));
-            surface.setText(Double.toString(Double.NaN));
-            stiffness.setText(Double.toString(Double.NaN));
-            amount.setText(Double.toString(Double.NaN));
-            mass.setText(Double.toString(Double.NaN));
-            volume.setText(Double.toString(Double.NaN));
-        }
+//        List<ProductionInput> pi = DBManager.getINSTANCE().findAllInputForPid(pid);
+//        if(pi.size() >= 2) {
+//            ParameterJson[] parameterJsons = pi.get(1).getParameters();
+//            temperature.setText(parameterJsons[0].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[0].getValue().toString());
+//            flexibility.setText(parameterJsons[1].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[1].getValue().toString());
+//            surface.setText(parameterJsons[2].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[2].getValue().toString());
+//            stiffness.setText(parameterJsons[3].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[3].getValue().toString());
+//            amount.setText(parameterJsons[4].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[4].getValue().toString());
+//            mass.setText(parameterJsons[5].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[5].getValue().toString());
+//            volume.setText(parameterJsons[6].getValue() == null ? Double.toString(Double.NaN) : parameterJsons[6].getValue().toString());
+//        } else {
+//            temperature.setText(Double.toString(Double.NaN));
+//            flexibility.setText(Double.toString(Double.NaN));
+//            surface.setText(Double.toString(Double.NaN));
+//            stiffness.setText(Double.toString(Double.NaN));
+//            amount.setText(Double.toString(Double.NaN));
+//            mass.setText(Double.toString(Double.NaN));
+//            volume.setText(Double.toString(Double.NaN));
+//        }
     }
 
 }

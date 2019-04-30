@@ -23,18 +23,18 @@ public class ResultTabController implements InputOutputStageRefresh {
 
     @Override
     public void refresh(Long pid) {
-        List<ProductionOutput> list = DBManager.getINSTANCE().findAllOutputForPid(pid);
-        if(!list.isEmpty()) {
-            ProductionOutput po = list.get(0);
-            wjp.setText(po.getWjp() == null ? Double.toString(Double.NaN) : po.getWjp().toString());
-            temperature.setText(po.getTemperature() == null ? Double.toString(Double.NaN) : po.getTemperature().getValue().toString());
-            surface.setText(po.getSurface() == null ? Double.toString(Double.NaN) : po.getSurface().getValue().toString());
-            flexibility.setText(po.getFlexibility() == null ? Double.toString(Double.NaN) : po.getFlexibility().getValue().toString());
-        } else {
-            wjp.setText(Double.toString(Double.NaN));
-            temperature.setText(Double.toString(Double.NaN));
-            flexibility.setText(Double.toString(Double.NaN));
-            surface.setText(Double.toString(Double.NaN));
-        }
+//        List<ProductionOutput> list = DBManager.getINSTANCE().findAllOutputForPid(pid);
+//        if(!list.isEmpty()) {
+//            ProductionOutput po = list.get(0);
+//            wjp.setText(po.getWjp() == null ? Double.toString(Double.NaN) : po.getWjp().toString());
+//            temperature.setText(po.getTemperature() == null ? Double.toString(Double.NaN) : po.getTemperature().getValue().toString());
+//            surface.setText(po.getSurface() == null ? Double.toString(Double.NaN) : po.getSurface().getValue().toString());
+//            flexibility.setText(po.getFlexibility() == null ? Double.toString(Double.NaN) : po.getFlexibility().getValue().toString());
+//        } else {
+//            wjp.setText(Double.toString(Double.NaN));
+//            temperature.setText(Double.toString(Double.NaN));
+//            flexibility.setText(Double.toString(Double.NaN));
+//            surface.setText(Double.toString(Double.NaN));
+//        }
     }
 }
