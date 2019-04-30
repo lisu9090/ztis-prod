@@ -70,6 +70,33 @@ public class UIAgent extends Agent implements InterfaceUI{
 //                }
 //            }
 //        });
+        addBehaviour(new CyclicBehaviour(this)
+        {
+            public void action(){
+                MessageTemplate startAck = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("START ACK"));
+                MessageTemplate stopAck = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("STOP ACK"));
+                MessageTemplate pauseAck = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("PAUSE ACK"));
+                MessageTemplate done = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchContent("SIMULATION DONE"));
+                
+                ACLMessage msg = receive(startAck);
+                if(msg != null){
+                    simulationTabPageController.printToConsole("Simulation started.");
+                }
+                msg = receive(stopAck);
+                if(msg != null){
+                    
+                }
+                msg = receive(pauseAck);
+                if(msg != null){
+                    
+                }
+                msg = receive(done);
+                if(msg != null){
+                    simulationTabPageController.printToConsole("Simulation compleated.");
+                }
+                block();
+            }
+        });
         
         addBehaviour(new CyclicBehaviour(this)
         {

@@ -130,8 +130,8 @@ public class ProcessAgent extends Agent {
         addBehaviour(new Behaviour(this) {
             private int step = 0;
             private boolean stop = false;
-            private MessageTemplate stopTemplate = MessageTemplate.MatchContent("STOP");
-            private MessageTemplate pauseTemplate = MessageTemplate.MatchContent("PAUSE");
+            private MessageTemplate stopTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("STOP"));
+            private MessageTemplate pauseTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("PAUSE"));
             private List<JSONObject> processesJsonList = new ArrayList();
                     
             @Override
@@ -179,7 +179,10 @@ public class ProcessAgent extends Agent {
                     msg.setContent(data.toString());
                     myAgent.send(msg);
                     
-                    //dodac wiadomosc potwierdzajaca ukonczenie symulacji
+                    msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.addReceiver((AID)args[0]);
+                    msg.setContent("SIMULATION DONE");
+                    myAgent.send(msg);
                     
                     return true;
                 }
