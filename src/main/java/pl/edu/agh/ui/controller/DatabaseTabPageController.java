@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.Button;
+import org.json.JSONObject;
 
 public class DatabaseTabPageController {
 
@@ -41,32 +43,43 @@ public class DatabaseTabPageController {
     private static DatabaseTabPageController instance;
 
     private ObservableList<ProcessDetailsWrapper> observableList;
+    
+    @FXML
+    public Button refreshDataButton;
 
     @FXML
     public void initialize() {
         instance = this;
         logger.info("init");
         TableColumn<ProcessDetailsWrapper, LocalDateTime> pidColumn = new TableColumn<>("PID");
-        TableColumn<ProcessDetailsWrapper, String> stageMultiColumn = new TableColumn<>("STAGES");
-        TableColumn<ProcessDetailsWrapper, Boolean> stageOneColumn = new TableColumn<>("I");
-        TableColumn<ProcessDetailsWrapper, Boolean> stageTwoColumn = new TableColumn<>("II");
-        TableColumn<ProcessDetailsWrapper, Boolean> stageThreeColumn = new TableColumn<>("III");
-        TableColumn<ProcessDetailsWrapper, String> outputMultiColumn = new TableColumn<>("RESULT");
-        TableColumn<ProcessDetailsWrapper, Double> temperatureColumn = new TableColumn<>("TEMPERATURE");
-        TableColumn<ProcessDetailsWrapper, Double> flexibilityColumn = new TableColumn<>("FLEXIBILITY");
-        TableColumn<ProcessDetailsWrapper, Double> surfaceColumn = new TableColumn<>("SURFACE");
+        TableColumn<ProcessDetailsWrapper, Double> inputMultiColumn = new TableColumn<>("INPUT");
+        TableColumn<ProcessDetailsWrapper, Double> inputTempMultiColumn = new TableColumn<>("TEMP");
+        TableColumn<ProcessDetailsWrapper, Double> inputMassMultiColumn = new TableColumn<>("MASS");
+        TableColumn<ProcessDetailsWrapper, Double> inputVolMultiColumn = new TableColumn<>("VOLUME");
+        TableColumn<ProcessDetailsWrapper, Double> outputMultiColumn = new TableColumn<>("OUTPUT");
+        TableColumn<ProcessDetailsWrapper, Double> outputTempMulitColumn = new TableColumn<>("TEMP");
+        TableColumn<ProcessDetailsWrapper, Double> outputFlexMultiColumn = new TableColumn<>("FLEX");
+        TableColumn<ProcessDetailsWrapper, Double> outputSurfMultiColumn = new TableColumn<>("SURF");
+        TableColumn<ProcessDetailsWrapper, Double> targetMutiColumn = new TableColumn<>("TARGET");
+        TableColumn<ProcessDetailsWrapper, Double> targetTempMulitColumn = new TableColumn<>("TEMP");
+        TableColumn<ProcessDetailsWrapper, Double> targetFlexMultiColumn = new TableColumn<>("FLEX");
+        TableColumn<ProcessDetailsWrapper, Double> targetSurfMultiColumn = new TableColumn<>("SURF");
         TableColumn<ProcessDetailsWrapper, Double> wjpColumn = new TableColumn<>("WJP");
 
-        stageMultiColumn.getColumns().addAll(stageOneColumn, stageTwoColumn, stageThreeColumn);
-        outputMultiColumn.getColumns().addAll(temperatureColumn, flexibilityColumn, surfaceColumn, wjpColumn);
+        inputMultiColumn.getColumns().addAll(inputTempMultiColumn, inputMassMultiColumn, inputVolMultiColumn);              
+        outputMultiColumn.getColumns().addAll(outputTempMulitColumn, outputFlexMultiColumn, outputSurfMultiColumn);
+        targetMutiColumn.getColumns().addAll(targetTempMulitColumn, targetFlexMultiColumn, targetSurfMultiColumn);
 
         pidColumn.setCellValueFactory(new PropertyValueFactory<>("pid"));
-        stageOneColumn.setCellValueFactory(new PropertyValueFactory<>("stageOne"));
-        stageTwoColumn.setCellValueFactory(new PropertyValueFactory<>("stageTwo"));
-        stageThreeColumn.setCellValueFactory(new PropertyValueFactory<>("stageThree"));
-        temperatureColumn.setCellValueFactory(new PropertyValueFactory<>("temperature"));
-        flexibilityColumn.setCellValueFactory(new PropertyValueFactory<>("flexibility"));
-        surfaceColumn.setCellValueFactory(new PropertyValueFactory<>("surface"));
+        inputTempMultiColumn.setCellValueFactory(new PropertyValueFactory<>("inputTemp"));
+        inputMassMultiColumn.setCellValueFactory(new PropertyValueFactory<>("inputMass"));
+        inputVolMultiColumn.setCellValueFactory(new PropertyValueFactory<>("inputVol"));
+        outputTempMulitColumn.setCellValueFactory(new PropertyValueFactory<>("outputTemp"));
+        outputFlexMultiColumn.setCellValueFactory(new PropertyValueFactory<>("outputFlex"));
+        outputSurfMultiColumn.setCellValueFactory(new PropertyValueFactory<>("outputSurf"));
+        targetTempMulitColumn.setCellValueFactory(new PropertyValueFactory<>("targetTemp"));
+        targetFlexMultiColumn.setCellValueFactory(new PropertyValueFactory<>("targetFlex"));
+        targetSurfMultiColumn.setCellValueFactory(new PropertyValueFactory<>("targetSurf"));
         wjpColumn.setCellValueFactory(new PropertyValueFactory<>("wjp"));
 
         databaseView.setRowFactory( tv -> {
@@ -81,10 +94,7 @@ public class DatabaseTabPageController {
         });
 
         pidColumn.setSortType(TableColumn.SortType.DESCENDING);
-
-//        observableList = FXCollections.observableArrayList(prepareData());
-        databaseView.setItems(observableList);
-        databaseView.getColumns().addAll(pidColumn, stageMultiColumn, outputMultiColumn);
+        databaseView.getColumns().addAll(pidColumn, inputMultiColumn, outputMultiColumn, targetMutiColumn, wjpColumn);
         
         try{
             AgentController ac = MainContainer.cc.getAgent("UI-agent");
@@ -97,9 +107,9 @@ public class DatabaseTabPageController {
 
     }
 
-//    private List<ProcessDetailsWrapper> prepareData(){
-//        List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
-//
+    public void setTableValuesFromJson(JSONObject data){
+        List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
+        
 //        AgentController ac = null;
 //        InterfaceUI uiObj = null;
 //        try {
@@ -132,8 +142,23 @@ public class DatabaseTabPageController {
 //            }
 //            tableElements.add(new ProcessDetailsWrapper(pid, stages[0], stages[1], stages[2], temperature, flexibility, surface, wjp));
 //        }
-//        return tableElements;
-//    }
+
+        for(String pid : data.keySet()){
+            JSONObject process = data.getJSONObject(pid);
+            JSONObject firstStage = process.getJSONObject("stage_1");
+            JSONObject lastStage = process.getJSONObject("stage_3");
+            tableElements.add(new ProcessDetailsWrapper(
+                Long.parseLong(pid),
+                firstStage.getDouble("in_temperature"), firstStage.getDouble("in_mass"), firstStage.getDouble("in_volume"),
+                lastStage.getDouble("out_temperature"), lastStage.getDouble("out_flexibility"), lastStage.getDouble("out_surface"),
+                process.getDouble("target_temperature"), process.getDouble("target_flexibility"), process.getDouble("target_surface"),
+                process.getString("wjp").equals("null") ? Double.NaN : process.getDouble("wjp")
+            ));
+        }
+        
+        observableList = FXCollections.observableArrayList(tableElements);
+        databaseView.setItems(observableList);
+    }
 
 
 
@@ -145,20 +170,18 @@ public class DatabaseTabPageController {
         }
     }
 
-    public void onTestButtonClick() {
-        showDetails(null);
-    }
+//    public void onTestButtonClick() {
+//        showDetails(null);
+//    }
 
-    public void onRefreshButtonClick() {
-        databaseView.getItems().removeAll(observableList);
-        observableList.removeAll();
-//        observableList.addAll(prepareData());
-        databaseView.setItems(observableList);
-    }
+//    public void onRefreshButtonClick() {
+//        databaseView.getItems().removeAll(observableList);
+//        observableList.removeAll();
+////        observableList.addAll(prepareData());
+//        databaseView.setItems(observableList);
+//    }
 
-    public static DatabaseTabPageController getInstance() {
-        return instance;
-    }
-
-
+//    public static DatabaseTabPageController getInstance() {
+//        return instance;
+//    }
 }

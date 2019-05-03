@@ -36,8 +36,8 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                     </rowConstraints>
                      <children>
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#onTestButtonClick" text="Test" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#onRefreshButtonClick" text="REFESH" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                        <!--<Button fx:id="" alignment="CENTER" mnemonicParsing="false" text="Test" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />-->
+                        <Button fx:id="refreshDataButton" alignment="CENTER" mnemonicParsing="false" text="Refresh" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                      </children>
                   </GridPane>
                </children>

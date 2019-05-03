@@ -8,12 +8,12 @@
     <artifactId>Szia-prod-v1</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-<!--    <repositories>
+    <repositories>
         <repository>
             <id>tilab</id>
             <url>http://jade.tilab.com/maven/</url>
         </repository>
-    </repositories>-->
+    </repositories>
 
 <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
@@ -50,13 +50,12 @@
         <version>20180813</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.tilab.jade/jade -->
-<!--    <dependency>
-        This dependency is no longer in repository. You need to install it manually from http://jade.tilab.com/
+    <!--This dependency is no longer in repository. You need to install it manually from http://jade.tilab.com/-->
+    <dependency>
         <groupId>com.tilab.jade</groupId>
         <artifactId>jade</artifactId>
         <version>4.5.0</version>
-    </dependency>-->
+    </dependency>
 
 </dependencies>
 

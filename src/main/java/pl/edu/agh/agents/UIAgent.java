@@ -98,10 +98,26 @@ public class UIAgent extends Agent implements InterfaceUI{
             }
         });
         
+        addBehaviour(new CyclicBehaviour(this) {
+            @Override
+            public void action() {
+                MessageTemplate resultTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchSender((AID)args[2]));
+                ACLMessage msg = receive(resultTemplate);
+                if(msg != null)
+                {
+                    JSONObject data = new JSONObject(msg.getContent());
+                    databaseTabPageController.setTableValuesFromJson(data);
+                }
+                else
+                    block();
+            }
+        });
+        
         addBehaviour(new CyclicBehaviour(this)
         {
             public void action(){
                 MessageTemplate resultTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+                
                 ACLMessage msg = receive(resultTemplate);
                 if(msg != null)
                 {
@@ -116,6 +132,7 @@ public class UIAgent extends Agent implements InterfaceUI{
     @Override
     public void setUIControllerRef(SimulationTabPageController instance){
         simulationTabPageController = instance;
+        
         simulationTabPageController.runButton.setOnAction((ActionEvent t) -> {
                 addBehaviour(new OneShotBehaviour(this) {
                     @Override
@@ -124,6 +141,7 @@ public class UIAgent extends Agent implements InterfaceUI{
                     }
                 });
         });
+        
         simulationTabPageController.stopButton.setOnAction((ActionEvent event) -> {
             addBehaviour(new OneShotBehaviour(this) {
                     @Override
@@ -132,6 +150,7 @@ public class UIAgent extends Agent implements InterfaceUI{
                     }
                 });
         });
+        
         simulationTabPageController.pauseButton.setOnAction((ActionEvent event) -> {
             addBehaviour(new OneShotBehaviour(this) {
                     @Override
@@ -145,6 +164,17 @@ public class UIAgent extends Agent implements InterfaceUI{
     @Override
     public void setUIControllerRef(DatabaseTabPageController instance){
         databaseTabPageController = instance;
+        
+        databaseTabPageController.refreshDataButton.setOnAction(event -> {
+            addBehaviour(new OneShotBehaviour(this) {
+                @Override
+                public void action() {
+                    sendReqForData(null);
+                }
+            });
+        });
+        
+        sendReqForData(null);
     }
 
     //db access start for GUI
@@ -244,6 +274,13 @@ public class UIAgent extends Agent implements InterfaceUI{
     
     private void sendPauseSimReq(){
         System.out.println("Sending Pause request..");
+    }
+    
+    private void sendReqForData(Long id){
+        ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
+        req.addReceiver((AID)args[2]);
+        req.setContent(id != null ? id.toString() : "ALL");
+        send(req);
     }
 
 //    //process run interface for GUI

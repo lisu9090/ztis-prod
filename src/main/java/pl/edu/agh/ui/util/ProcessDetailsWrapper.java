@@ -9,24 +9,34 @@ import java.time.ZoneId;
 public class ProcessDetailsWrapper {
 
     private ObjectProperty<LocalDateTime> pid = new SimpleObjectProperty<>(null);
-    private BooleanProperty stageOne = new SimpleBooleanProperty(false);
-    private BooleanProperty stageTwo = new SimpleBooleanProperty(false);
-    private BooleanProperty stageThree = new SimpleBooleanProperty(false);
+    private DoubleProperty inputTemp = new SimpleDoubleProperty(0);
+    private DoubleProperty inputMass = new SimpleDoubleProperty(0);
+    private DoubleProperty inputVol = new SimpleDoubleProperty(0);
+    private DoubleProperty outputTemp = new SimpleDoubleProperty(0);
+    private DoubleProperty outputFlex = new SimpleDoubleProperty(0);
+    private DoubleProperty outputSurf = new SimpleDoubleProperty(0);
+    private DoubleProperty targetTemp = new SimpleDoubleProperty(0);
+    private DoubleProperty targetFlex = new SimpleDoubleProperty(0);
+    private DoubleProperty targetSurf = new SimpleDoubleProperty(0);
     private DoubleProperty wjp = new SimpleDoubleProperty(0);
-    private DoubleProperty temperature = new SimpleDoubleProperty(0);
-    private DoubleProperty flexibility = new SimpleDoubleProperty(0);
-    private DoubleProperty surface = new SimpleDoubleProperty(0);
 
-
-    public ProcessDetailsWrapper(Long pid, boolean stageOne, boolean stageTwo, boolean stageThree, Double temperature, Double flexibility, Double surface, Double wjp) {
+    public ProcessDetailsWrapper() {
+    }
+    
+    public ProcessDetailsWrapper(Long pid, Double inputTemp, Double inputMass, Double inputVol, Double outputTemp, 
+            Double outputFlex, Double outputSurf, Double targetTemp, Double targetFlex, Double targetSurf, Double wjp) {
         this.pid.setValue(LocalDateTime.ofInstant(Instant.ofEpochMilli(pid), ZoneId.systemDefault()));
-        this.stageOne.setValue(stageOne);
-        this.stageTwo.setValue(stageTwo);
-        this.stageThree.setValue(stageThree);
+        this.inputMass.setValue(inputMass);
+        this.inputTemp.setValue(inputTemp);
+        this.inputMass.setValue(inputMass);
+        this.inputVol.setValue(inputVol);
+        this.outputTemp.setValue(outputTemp);
+        this.outputFlex.setValue(outputFlex);
+        this.outputSurf.setValue(outputSurf);
+        this.targetTemp.setValue(targetTemp);
+        this.targetFlex.setValue(targetFlex);
+        this.targetSurf.setValue(targetSurf);
         this.wjp.setValue(wjp);
-        this.temperature.setValue(temperature);
-        this.flexibility.setValue(flexibility);
-        this.surface.setValue(surface);
     }
 
     public LocalDateTime getPid() {
@@ -41,87 +51,83 @@ public class ProcessDetailsWrapper {
         this.pid.set(pid);
     }
 
-    public boolean isStageOne() {
-        return stageOne.get();
+    public Double getInputTemp() {
+        return inputTemp.getValue();
     }
 
-    public BooleanProperty stageOneProperty() {
-        return stageOne;
+    public void setInputTemp(Double inputTemp) {
+        this.inputTemp.setValue(inputTemp);
     }
 
-    public void setStageOne(boolean stageOne) {
-        this.stageOne.set(stageOne);
+    public Double getInputMass() {
+        return inputMass.getValue();
     }
 
-    public boolean isStageTwo() {
-        return stageTwo.get();
+    public void setInputMass(Double inputMass) {
+        this.inputMass.setValue(inputMass);
     }
 
-    public BooleanProperty stageTwoProperty() {
-        return stageTwo;
+    public Double getInputVol() {
+        return inputVol.getValue();
     }
 
-    public void setStageTwo(boolean stageTwo) {
-        this.stageTwo.set(stageTwo);
+    public void setInputVol(Double inputVol) {
+        this.inputVol.setValue(inputVol);
     }
 
-    public boolean isStageThree() {
-        return stageThree.get();
+    public Double getOutputTemp() {
+        return outputTemp.getValue();
     }
 
-    public BooleanProperty stageThreeProperty() {
-        return stageThree;
+    public void setOutputTemp(Double outputTemp) {
+        this.outputTemp.setValue(outputTemp);
     }
 
-    public void setStageThree(boolean stageThree) {
-        this.stageThree.set(stageThree);
+    public Double getOutputFlex() {
+        return outputFlex.getValue();
     }
 
-    public double getTemperature() {
-        return temperature.get();
+    public void setOutputFlex(Double outputFlex) {
+        this.outputFlex.setValue(outputFlex);
     }
 
-    public DoubleProperty temperatureProperty() {
-        return temperature;
+    public Double getOutputSurf() {
+        return outputSurf.getValue();
     }
 
-    public void setTemperature(double temperature) {
-        this.temperature.set(temperature);
+    public void setOutputSurf(Double outputSurf) {
+        this.outputSurf.setValue(outputSurf);
     }
 
-    public double getFlexibility() {
-        return flexibility.get();
+    public Double getTargetTemp() {
+        return targetTemp.getValue();
     }
 
-    public DoubleProperty flexibilityProperty() {
-        return flexibility;
+    public void setTargetTemp(Double targetTemp) {
+        this.targetTemp.setValue(targetTemp);
     }
 
-    public void setFlexibility(double flexibility) {
-        this.flexibility.set(flexibility);
+    public Double getTargetFlex() {
+        return targetFlex.getValue();
     }
 
-    public double getSurface() {
-        return surface.get();
+    public void setTargetFlex(Double targetFlex) {
+        this.targetFlex.setValue(targetFlex);
     }
 
-    public DoubleProperty surfaceProperty() {
-        return surface;
+    public Double getTargetSurf() {
+        return targetSurf.getValue();
     }
 
-    public void setSurface(double surface) {
-        this.surface.set(surface);
+    public void setTargetSurf(Double targetSurf) {
+        this.targetSurf.setValue(targetSurf);
     }
 
-    public double getWjp() {
-        return wjp.get();
+    public Double getWjp() {
+        return wjp.getValue();
     }
 
-    public DoubleProperty wjpProperty() {
-        return wjp;
-    }
-
-    public void setWjp(double wjp) {
-        this.wjp.set(wjp);
+    public void setWjp(Double wjp) {
+        this.wjp.setValue(wjp);
     }
 }
