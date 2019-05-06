@@ -61,13 +61,14 @@ public abstract class MLAgent extends Agent{
         {
             public void action() //Request for learn action from ui agent
             {
-                MessageTemplate learningTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("START LEARN"));
+                MessageTemplate learningTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("START TRAINING"));
                 ACLMessage learningRequest = receive(learningTemplate);
                 if(learningRequest != null){
                     ACLMessage res = learningRequest.createReply();
                     res.setContent("TRAINING STARTED");
                     send(res);
                     learn();
+                    sendTrainingCompleated(learningRequest.getSender());
                 }
                 else
                     block();
@@ -82,11 +83,18 @@ public abstract class MLAgent extends Agent{
         send(req);
     }
     
-    private void blockingSendReceiveForData(Long id){ //blocking
+    private void blockingSendReceiveForData(Long id){
         sendRequestForData(id);
         MessageTemplate dataResTemplate =  MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchSender((AID)args[2]));
         ACLMessage dataResponse = blockingReceive(dataResTemplate);
         receiveData(dataResponse.getContent());
+    }
+    
+    private void sendTrainingCompleated(AID receiver){
+        ACLMessage req = new ACLMessage(ACLMessage.INFORM);
+        req.addReceiver(receiver);
+        req.setContent("TRAINING COMPLEATED");
+        send(req);
     }
     
     protected abstract JSONObject decision(String params);

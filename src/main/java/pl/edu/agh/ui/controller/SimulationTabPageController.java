@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.edu.agh.agents.InterfaceUI;
@@ -58,6 +59,7 @@ public class SimulationTabPageController{
     public Button stopButton;
     public Button pauseButton;
     public Button runButton;
+    public Button learnButton;
 
 
     private DistributionParams distributionConstructorParams;
@@ -142,19 +144,23 @@ public class SimulationTabPageController{
                 paramOneValue.setDisable(true);
                 paramTwoValue.setDisable(true);
             } else if(newValue.intValue() == 1) {
-                distributionConstructorParams.setParamOne("Alpha:");
-                distributionConstructorParams.setParamTwo("Beta:");
+                distributionConstructorParams.setParamOne("*Alpha:");
+                distributionConstructorParams.setParamTwo("*Beta:");
                 paramOneValue.setDisable(false);
+                paramOneValue.setText("0");
                 paramTwoValue.setDisable(false);
+                paramTwoValue.setText("0");
             } else if(newValue.intValue() == 3) {
-                distributionConstructorParams.setParamOne("Probability:");
+                distributionConstructorParams.setParamOne("*Probability:");
                 distributionConstructorParams.setParamTwo("Parameter 2:");
                 paramOneValue.setDisable(false);
+                paramOneValue.setText("0");
                 paramTwoValue.setDisable(true);
             } else if(newValue.intValue() == 4) {
-                distributionConstructorParams.setParamOne("Mean:");
+                distributionConstructorParams.setParamOne("*Mean:");
                 distributionConstructorParams.setParamTwo("Parameter 2:");
                 paramOneValue.setDisable(false);
+                paramOneValue.setText("0");
                 paramTwoValue.setDisable(true);
             }
         });
@@ -171,7 +177,7 @@ public class SimulationTabPageController{
         volume.setText("2.0");
         bucketAuto.setSelected(true);
 
-        deltaTemperature.setText("0");
+        deltaTemperature.setText("1200.0");
     }
 
     private static class TextAreaOutputStream extends OutputStream {
@@ -189,6 +195,9 @@ public class SimulationTabPageController{
     }
 
     public void printToConsole(String msg){
-        textAreaConsole.appendText("\n" + msg);
+        Runnable appendTask = () -> {
+            textAreaConsole.appendText("\n" + msg);
+        };
+        Platform.runLater(appendTask);
     }
 }

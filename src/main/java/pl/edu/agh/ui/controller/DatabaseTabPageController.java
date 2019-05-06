@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import org.json.JSONObject;
 
@@ -108,59 +109,27 @@ public class DatabaseTabPageController {
     }
 
     public void setTableValuesFromJson(JSONObject data){
-        List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
-        
-//        AgentController ac = null;
-//        InterfaceUI uiObj = null;
-//        try {
-//            ac = MainContainer.cc.getAgent("UI-agent");
-//            uiObj = ac.getO2AInterface(InterfaceUI.class);
-//        } catch (ControllerException e) {
-//            e.printStackTrace();
-//        }
-//
-//        List<ProcessJson> processes = DBManager.getINSTANCE().findAllProcesses();
-//
-//        for (ProcessJson p : processes) {
-//            System.out.println("Process ID: " + p.getId());
-//            Long pid = p.getId();
-//            Double wjp = Double.NaN, temperature = Double.NaN, flexibility = Double.NaN, surface = Double.NaN;
-//            boolean[] stages = new boolean[]{false, false, false};
-//
-//            List<ProductionInput> inputs = DBManager.getINSTANCE().findAllInputForPid(p.getId());
-//            for(int i=0; i<inputs.size(); i++) {
-//                stages[i] = inputs.get(i).getStage() != null;
-//            }
-//
-//            List<ProductionOutput> outputs = DBManager.getINSTANCE().findAllOutputForPid(p.getId());
-//            for(ProductionOutput po : outputs) {
-//                wjp = po.getWjp();
-//                System.out.println(wjp);
-//                temperature = (Double) po.getTemperature().toObject().getValue();
-//                flexibility = (Double) po.getFlexibility().toObject().getValue();
-//                surface = (Double) po.getSurface().toObject().getValue();
-//            }
-//            tableElements.add(new ProcessDetailsWrapper(pid, stages[0], stages[1], stages[2], temperature, flexibility, surface, wjp));
-//        }
+        Runnable updateTable = () -> {
+            List<ProcessDetailsWrapper> tableElements = new ArrayList<>();
 
-        for(String pid : data.keySet()){
-            JSONObject process = data.getJSONObject(pid);
-            JSONObject firstStage = process.getJSONObject("stage_1");
-            JSONObject lastStage = process.getJSONObject("stage_3");
-            tableElements.add(new ProcessDetailsWrapper(
-                Long.parseLong(pid),
-                firstStage.getDouble("in_temperature"), firstStage.getDouble("in_mass"), firstStage.getDouble("in_volume"),
-                lastStage.getDouble("out_temperature"), lastStage.getDouble("out_flexibility"), lastStage.getDouble("out_surface"),
-                process.getDouble("target_temperature"), process.getDouble("target_flexibility"), process.getDouble("target_surface"),
-                process.getString("wjp").equals("null") ? Double.NaN : process.getDouble("wjp")
-            ));
-        }
-        
-        observableList = FXCollections.observableArrayList(tableElements);
-        databaseView.setItems(observableList);
+            for(String pid : data.keySet()){
+                JSONObject process = data.getJSONObject(pid);
+                JSONObject firstStage = process.getJSONObject("stage_1");
+                JSONObject lastStage = process.getJSONObject("stage_3");
+                tableElements.add(new ProcessDetailsWrapper(
+                    Long.parseLong(pid),
+                    firstStage.getDouble("in_temperature"), firstStage.getDouble("in_mass"), firstStage.getDouble("in_volume"),
+                    lastStage.getDouble("out_temperature"), lastStage.getDouble("out_flexibility"), lastStage.getDouble("out_surface"),
+                    process.getDouble("target_temperature"), process.getDouble("target_flexibility"), process.getDouble("target_surface"),
+                    process.getString("wjp").equals("null") ? Double.NaN : process.getDouble("wjp")
+                ));
+            }
+
+            observableList = FXCollections.observableArrayList(tableElements);
+            databaseView.setItems(observableList);
+        };
+        Platform.runLater(updateTable);
     }
-
-
 
     private void showDetails(ProcessDetailsWrapper wrapper) {
         try {
@@ -169,19 +138,4 @@ public class DatabaseTabPageController {
             e.printStackTrace();
         }
     }
-
-//    public void onTestButtonClick() {
-//        showDetails(null);
-//    }
-
-//    public void onRefreshButtonClick() {
-//        databaseView.getItems().removeAll(observableList);
-//        observableList.removeAll();
-////        observableList.addAll(prepareData());
-//        databaseView.setItems(observableList);
-//    }
-
-//    public static DatabaseTabPageController getInstance() {
-//        return instance;
-//    }
 }

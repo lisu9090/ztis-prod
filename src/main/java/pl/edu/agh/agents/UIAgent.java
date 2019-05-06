@@ -44,6 +44,8 @@ public class UIAgent extends Agent implements InterfaceUI{
                 MessageTemplate stopAck = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("STOP ACK"));
                 MessageTemplate pauseAck = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("PAUSE ACK"));
                 MessageTemplate done = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchContent("SIMULATION DONE"));
+                MessageTemplate tariningStarted = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchContent("TRAINING STARTED"));
+                MessageTemplate trainingCompleated = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchContent("TRAINING COMPLEATED"));
                 
                 ACLMessage msg = receive(startAck);
                 if(msg != null){
@@ -60,6 +62,14 @@ public class UIAgent extends Agent implements InterfaceUI{
                 msg = receive(done);
                 if(msg != null){
                     simulationTabPageController.printToConsole("Simulation compleated.");
+                }
+                msg = receive(tariningStarted);
+                if(msg != null){
+                    simulationTabPageController.printToConsole(msg.getSender().getName() + " - training started.");
+                }
+                msg = receive(trainingCompleated);
+                if(msg != null){
+                    simulationTabPageController.printToConsole(msg.getSender().getName() + " - training compleated.");
                 }
                 block();
             }
@@ -83,7 +93,7 @@ public class UIAgent extends Agent implements InterfaceUI{
         addBehaviour(new CyclicBehaviour(this)
         {
             public void action(){
-                MessageTemplate resultTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+                MessageTemplate resultTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchSender((AID)args[1]));
                 
                 ACLMessage msg = receive(resultTemplate);
                 if(msg != null)
@@ -105,6 +115,15 @@ public class UIAgent extends Agent implements InterfaceUI{
                     @Override
                     public void action() {
                        sendRunSimReq();
+                    }
+                });
+        });
+        
+        simulationTabPageController.learnButton.setOnAction((ActionEvent event) -> {
+            addBehaviour(new OneShotBehaviour(this) {
+                    @Override
+                    public void action() {
+                       sendLearnReq();
                     }
                 });
         });
@@ -150,6 +169,8 @@ public class UIAgent extends Agent implements InterfaceUI{
             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
             msg.addReceiver((AID)args[1]);
 
+            //TODO dodac walidacje wymaganych pol!
+            
             if(!simulationTabPageController.simulationsCount.getText().matches(numberRegexp) || simulationTabPageController.simulationsCount.getText().length()<1)
                 return;
             simParams.put("noSim", simulationTabPageController.simulationsCount.getText());
@@ -169,7 +190,7 @@ public class UIAgent extends Agent implements InterfaceUI{
                 return;
             simParams.put("targetSurface", simulationTabPageController.targetSurface.getText());
 
-            //STEP1 add value control
+            //STEP1
             simParams.put("temperature", simulationTabPageController.temperature.getText());
             simParams.put("mass", simulationTabPageController.mass.getText());
             simParams.put("volume", simulationTabPageController.volume.getText());
@@ -184,6 +205,14 @@ public class UIAgent extends Agent implements InterfaceUI{
         catch(NumberFormatException e){
             System.out.println("Sending run process req err " + e);
         }
+    }
+    
+    private void sendLearnReq(){
+        ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
+        req.addReceiver((AID)args[3]);
+        req.addReceiver((AID)args[4]);
+        req.setContent("START TRAINING");
+        send(req);
     }
     
     private void sendStopSimReq(){

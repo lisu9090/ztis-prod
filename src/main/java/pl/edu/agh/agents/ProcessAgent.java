@@ -132,9 +132,9 @@ public class ProcessAgent extends Agent {
         try{
             if(prodModel.inputTemperature == null || prodModel.inputVolume == null || prodModel.inputMass == null){
                 JSONObject content = process.paramsToJson();
-                content.put("user_temperature", prodModel.inputTemperature == null ? "" : prodModel.inputTemperature);
-                content.put("user_mass", prodModel.inputMass == null ? "" : prodModel.inputMass);
-                content.put("user_volume", prodModel.inputVolume == null ? "" : prodModel.inputVolume);
+                content.put("user_temperature", prodModel.inputTemperature == null ? "" : prodModel.inputTemperature.toString());
+                content.put("user_mass", prodModel.inputMass == null ? "" : prodModel.inputMass.toString());
+                content.put("user_volume", prodModel.inputVolume == null ? "" : prodModel.inputVolume.toString());
                 
                 JSONObject help = blockingSendReciveHelpRequest((AID)args[3], content.toString());
                 
@@ -151,8 +151,8 @@ public class ProcessAgent extends Agent {
             
             if(prodModel.deltaTemp == null || prodModel.bucketSize == null){
                 JSONObject content = process.paramsToJson();
-                content.put("user_deltaTemp", prodModel.deltaTemp == null ? "" : prodModel.deltaTemp);
-                content.put("user_bucketSize", prodModel.bucketSize == null ? "" : prodModel.bucketSize);
+                content.put("user_deltaTemp", prodModel.deltaTemp == null ? "" : prodModel.deltaTemp.toString());
+                content.put("user_bucketSize", prodModel.bucketSize == null ? "" : prodModel.bucketSize.toString());
                 
                 JSONObject help = blockingSendReciveHelpRequest((AID)args[4], content.toString());
                 
