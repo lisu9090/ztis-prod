@@ -26,71 +26,6 @@ public class ProcessAgent extends Agent {
     protected void setup()
     {
         args = getArguments();
-//        addBehaviour(new CyclicBehaviour(this)
-//        {
-//            public void action()
-//            {
-//                ACLMessage reply;
-//
-//                ArrayList<MessageTemplate> templates = new ArrayList<>();
-//                templates.add(MessageTemplate.MatchPerformative(AgentMessages.CHECK_AGENT));
-//                templates.add(MessageTemplate.MatchPerformative(AgentMessages.START_PROCESS));
-//                templates.add(MessageTemplate.MatchPerformative(AgentMessages.SET_PROCESS_VALUES));
-//
-//                ACLMessage [] checkMsg = new ACLMessage[templates.size()];
-//                int counter = 0;
-//                for(MessageTemplate checkState: templates){
-//                    checkMsg[counter++] = receive(checkState);
-//                }
-//                for(ACLMessage msg: checkMsg) {
-//                    if (msg != null) {
-//                        switch(msg.getPerformative()) {
-//                            case (AgentMessages.CHECK_AGENT):
-//                                reply = new ACLMessage(AgentMessages.CHECK_AGENT);
-//                                reply.setContent("success");
-//                                reply.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
-//                                send(reply);
-//                                break;
-//                            case (AgentMessages.SET_PROCESS_VALUES):
-//                                processParameters = msg.getContent().split("\\s+");
-//                                reply = new ACLMessage(AgentMessages.SET_PROCESS_VALUES_ACK);
-//                                reply.setContent("success");
-//                                reply.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
-//                                send(reply);
-//                                break;
-//                            case (AgentMessages.START_PROCESS):
-//                                String result = "";
-//                                ProductionProcess process = new ProductionProcess(Double.parseDouble(processParameters[0]),
-//                                                Double.parseDouble(processParameters[1]),
-//                                                Double.parseDouble(processParameters[2])); //instancja processu z zainicjalizowanymi docelowymi parametrami
-//                                process.setGeneratorRange(new GeneratorRange.Builder()
-//                                        .temperature(60.0)
-//                                        .volume(0.05)
-//                                        .mass(100.0)
-//                                        .stiffness(0.1)
-//                                        .amount(1.0)
-//                                        .surface(1.0)
-//                                        .build());
-//                                process.setGenerator(resolveFromName(processParameters[3]));
-//                                try {
-//                                    Double wjp = process.runProcess(Double.parseDouble(processParameters[4]),
-//                                            Double.parseDouble(processParameters[5]),
-//                                            Double.parseDouble(processParameters[6]));
-//                                    result = Double.toString(wjp);
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-//                                reply = new ACLMessage(AgentMessages.RECEIVE_RESULT);
-//                                reply.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
-//                                reply.setContent(result);
-//                                send(reply);
-//                                doDelete();
-//                        }
-//                    }
-//                }
-//                block();
-//            }
-//        });
         
         addBehaviour(new CyclicBehaviour(this)
         {
@@ -125,7 +60,7 @@ public class ProcessAgent extends Agent {
         prodModel.inputMass = params.getString("mass").equals("") ? null : params.getDouble("mass");
         prodModel.inputVolume = params.getString("volume").equals("") ? null : params.getDouble("volume");
         prodModel.deltaTemp = params.getString("deltaTemperature").equals("") ? null : params.getDouble("deltaTemperature");
-        prodModel.bucketSize = params.getString("bucketSize").equals("") ? null : params.getDouble("bucketSize");
+        prodModel.bucketSize = params.getString("bucketSize").equals("") ? null : Parameter.Size.valueOf(params.getString("bucketSize"));
         
         addBehaviour(new Behaviour(this) {
             private int step = 0;
@@ -191,13 +126,44 @@ public class ProcessAgent extends Agent {
         });
     }
  
-        private ProductionProcess runProcess(){
+    private ProductionProcess runProcess(){
         ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
         process.setGenerator(prodModel.generator);
         try{
-            //dodac logike agentow uczacych sie
+            if(prodModel.inputTemperature == null || prodModel.inputVolume == null || prodModel.inputMass == null){
+                JSONObject content = process.paramsToJson();
+                content.put("user_temperature", prodModel.inputTemperature == null ? "" : prodModel.inputTemperature);
+                content.put("user_mass", prodModel.inputMass == null ? "" : prodModel.inputMass);
+                content.put("user_volume", prodModel.inputVolume == null ? "" : prodModel.inputVolume);
+                
+                JSONObject help = blockingSendReciveHelpRequest((AID)args[3], content.toString());
+                
+                if(prodModel.inputTemperature == null)
+                    prodModel.inputTemperature = help.getDouble("temperature");
+                
+                if(prodModel.inputMass == null)
+                    prodModel.inputMass = help.getDouble("mass");
+                
+                if(prodModel.inputVolume == null)
+                    prodModel.inputVolume = help.getDouble("volume");
+            }
             process.firstStep(prodModel.inputTemperature, prodModel.inputVolume, prodModel.inputMass);
-            process.secondStep(1200.0, Parameter.Size.SMALL);
+            
+            if(prodModel.deltaTemp == null || prodModel.bucketSize == null){
+                JSONObject content = process.paramsToJson();
+                content.put("user_deltaTemp", prodModel.deltaTemp == null ? "" : prodModel.deltaTemp);
+                content.put("user_bucketSize", prodModel.bucketSize == null ? "" : prodModel.bucketSize);
+                
+                JSONObject help = blockingSendReciveHelpRequest((AID)args[4], content.toString());
+                
+                if(prodModel.deltaTemp == null)
+                    prodModel.deltaTemp = help.getDouble("deltaTemp");
+                
+                if(prodModel.bucketSize == null)
+                    prodModel.bucketSize = Parameter.Size.valueOf(help.getString("bucketSize"));
+            }
+            process.secondStep(prodModel.deltaTemp, prodModel.bucketSize);
+            
             process.thirdStep();
         }
         catch(Exception e){
@@ -207,29 +173,13 @@ public class ProcessAgent extends Agent {
         return process;
     }
     
-//    private String runProcess(List<JSONObject> outputParamsLog){
-//        String outputLog;
-//        //process object
-//        ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
-//        process.setGenerator(prodModel.generator);
-//        try{
-//            //add rest of params (gen, gen params) and ask for help ml agents if some of params are not set.
-//            outputLog = "Production compleated! WJP = " + process.runProcess(prodModel.inputTemperature, prodModel.inputMass, prodModel.inputVolume);
-//            if(outputParamsLog != null){
-//                outputParamsLog.add(process.paramsToJson());
-//            }
-//        }
-//        catch(Exception e){
-//            outputLog = "Production failure! " + e;
-//        }
-//        return outputLog;
-//    }
-
-//    private IDistGenerator resolveFromName(String typeName) {
-//        if (typeName.equals(GenNames.NOMINAL.name()))
-//            return new NomiGen();
-//        else
-//            return new GaussGen();
-//
-//    }
+    private JSONObject blockingSendReciveHelpRequest(AID id, String content){
+        ACLMessage helpRequest = new ACLMessage(ACLMessage.CFP);
+        helpRequest.addReceiver(id);
+        helpRequest.setContent(content);
+        send(helpRequest);
+        MessageTemplate respTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.PROPOSE), MessageTemplate.MatchSender(id));
+        ACLMessage resopnse = blockingReceive();
+        return new JSONObject(resopnse.getContent());
+    }
 }

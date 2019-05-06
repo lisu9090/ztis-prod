@@ -24,14 +24,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            //            AgentController prod = MainContainer.cc.createNewAgent("Production-agent",
-//                    "pl.edu.agh.agents.ProductionAgent", null);
-//            prod.start();
             
             AgentController rma = MainContainer.cc.createNewAgent("rma", "jade.tools.rma.rma", null);
             rma.start();
 
-            Object [] args = {new AID("UI-agent", AID.ISLOCALNAME), new AID("Process-agent", AID.ISLOCALNAME), new AID("Database-agent", AID.ISLOCALNAME)};
+            Object [] args = {new AID("UI-agent", AID.ISLOCALNAME), new AID("Process-agent", AID.ISLOCALNAME), new AID("Database-agent", AID.ISLOCALNAME), 
+                new AID("ProcessInput-agent", AID.ISLOCALNAME), new AID("SecondStage-agent", AID.ISLOCALNAME)};
 
             //initialize UI agent
             
@@ -44,6 +42,13 @@ public class Main extends Application {
             //initialize database agent
             AgentController database = MainContainer.cc.createNewAgent("Database-agent", "pl.edu.agh.agents.DatabaseAgent", args);
             database.start();
+            
+            //initialize ML agents
+            AgentController ml1 = MainContainer.cc.createNewAgent("ProcessInput-agent", "pl.edu.agh.agents.ProcessInputAgent", args);
+            ml1.start();
+            
+            AgentController ml2 = MainContainer.cc.createNewAgent("SecondStage-agent", "pl.edu.agh.agents.SecondStageAgent", args);
+            ml2.start();
 
         } catch (StaleProxyException e) {
             e.printStackTrace();

@@ -238,9 +238,9 @@
                               </Label>
                                     <Label text="Bucket size:" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
                                     <RadioButton fx:id="bucketAuto" mnemonicParsing="false" text="Auto" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                                    <RadioButton fx:id="bucketSmall" mnemonicParsing="false" text="Small" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                                    <RadioButton fx:id="bucketMedium" mnemonicParsing="false" text="Medium" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                                    <RadioButton fx:id="bucketHigh" mnemonicParsing="false" text="High" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                                    <RadioButton fx:id="bucketSmall" mnemonicParsing="false" text="S" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                    <RadioButton fx:id="bucketMedium" mnemonicParsing="false" text="M" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                    <RadioButton fx:id="bucketHigh" mnemonicParsing="false" text="L" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
                               <!--<TextField fx:id="deltaTemperature1" prefWidth="150.0" GridPane.columnIndex="2" GridPane.hgrow="SOMETIMES" />-->
                               <TextField fx:id="deltaTemperature" prefWidth="150.0" GridPane.columnIndex="2" GridPane.hgrow="NEVER" />
                                 </children>

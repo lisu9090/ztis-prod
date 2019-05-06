@@ -18,37 +18,12 @@ public class DatabaseAgent extends Agent {
     
     protected void setup()
     {
-//        final int CHECK_AGENT = 100;
         args = getArguments();
 
         addBehaviour(new CyclicBehaviour(this)
         {
             public void action()
             {
-//                MessageTemplate checkState = MessageTemplate.MatchPerformative(CHECK_AGENT);
-//                MessageTemplate getDatabase = MessageTemplate.MatchPerformative(AgentMessages.GET_PROCESS_IDS);
-//                ACLMessage checkMsg = receive(checkState);
-//                ACLMessage dbMsg = receive(getDatabase);
-//                if (checkMsg!=null){
-//                    ACLMessage reply = new ACLMessage(CHECK_AGENT);
-//                    reply.setContent("success");
-//                    reply.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
-//                    send(reply);
-//                }
-//                else if(dbMsg!=null){
-//                    List<ProcessJson> processes = DBManager.getINSTANCE().findAllProcesses();
-//                    String message = "";
-//                    for(ProcessJson process: processes){
-//                        message += process.getId().toString()+" ";
-//                    }
-//
-//                    ACLMessage reply = new ACLMessage(AgentMessages.GET_PROCESS_IDS_ACK);
-//                    reply.setContent(message);
-//                    reply.addReceiver(new AID( args[0].toString(), AID.ISLOCALNAME));
-//                    send(reply);
-//                }
-//                block();
-                
                 MessageTemplate putDataInform = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
                 ACLMessage request = receive(putDataInform);
                 if(request != null){
@@ -61,6 +36,7 @@ public class DatabaseAgent extends Agent {
                     block();
             }
         });
+        
         addBehaviour(new CyclicBehaviour(this) {
             @Override
             public void action() {

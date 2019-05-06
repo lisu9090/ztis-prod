@@ -55,5 +55,5 @@ public class ProdInputModel {
     public Double inputVolume;
     
     public Double deltaTemp;
-    public Double bucketSize;  
+    public Parameter.Size bucketSize;  
 }

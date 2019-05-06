@@ -100,16 +100,6 @@ public class ProductionProcess {
         return (Math.abs(outputTemperature.getValue() - temperature.getValue()) + Math.abs(outputSurface.getValue() - surface.getValue())
                 + Math.abs(outputFlexibility.getValue() - flexibility.getValue())) * amount.getValue();
     }
-    
-//  private void saveCurrentStage(int stageNum) {
-//        DBManager.getINSTANCE()
-//                .saveProductionInput(new ProductionInput(
-//                        System.currentTimeMillis(), stageNum, pid,
-//                        Stream.of(temperature, flexibility, surface, stiffness, amount, mass, volume)
-//                                .map(it -> it.toJson(pid, stageNum))
-//                                .collect(Collectors.toList())
-//                                .toArray(new ParameterJson[7])));
-//    }
 
     public void firstStep(Double temp, Double vol, Double mass) throws Exception {
         temperature.setValue(temp);
@@ -117,7 +107,6 @@ public class ProductionProcess {
         this.mass.setValue(mass);
         
         JSONObject params = new JSONObject();
-//        params.put("stage", "1");
         params.put("in_temperature", temp);
         params.put("in_volume", vol);
         params.put("in_mass", mass);
@@ -169,14 +158,6 @@ public class ProductionProcess {
         
         this.size = size.getValue();
 
-//        double temporary = temperature.getValue();
-//        if (temporary < 400)
-//            this.size = Parameter.Size.SMALL.getValue();
-//        else if (temporary < 600)
-//            this.size = Parameter.Size.MEDIUM.getValue();
-//        else
-//            this.size = Parameter.Size.LARGE.getValue();
-
         amount.setValue(Math.floor(volume.getValue() / this.size));
         //amount.setValue(generator.generate(Math.floor(volume.getValue() / size.getValue()) , amount.getGeneratorRange()));
         if (!amount.isCorrectValue())
@@ -216,7 +197,6 @@ public class ProductionProcess {
     }
 
     public Double runProcess(Double temp, Double vol, Double mass) throws Exception {
-        //1600.0, 2.0, 16000.0
         logger.debug("Production process started! Target parameters: max temperature = " + outputTemperature.getValue()
                 + ", targetSurface = " + outputSurface.getValue() + ", flexibility = " + outputFlexibility.getValue());
         firstStep(temp, vol, mass);
@@ -228,9 +208,7 @@ public class ProductionProcess {
         thirdStep();
         logger.debug("Third step successfull! Obtained parameters: temperature = " + temperature.getValue()
                 + ", targetSurface = " + surface.getValue() + ", flexibility = " + flexibility.getValue());
-
-        Double wjp = computeWJP();
-//        DBManager.getINSTANCE().saveProductionOutput(new ProductionOutput(System.currentTimeMillis(), pid, wjp, outputTemperature.toJson(pid, 3), outputSurface.toJson(pid, 3), outputFlexibility.toJson(pid, 3)));
-        return wjp;
+        
+        return computeWJP();
     }
 }

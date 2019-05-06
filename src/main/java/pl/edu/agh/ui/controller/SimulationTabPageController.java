@@ -26,6 +26,7 @@ import pl.edu.agh.ui.log.appender.StaticOutputStreamAppender;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
+import pl.edu.agh.parameter.Parameter;
 
 public class SimulationTabPageController{
 
@@ -56,10 +57,8 @@ public class SimulationTabPageController{
     
     public Button stopButton;
     public Button pauseButton;
-//    public Button resetButton;
     public Button runButton;
 
-//    public TextField flexibility;
 
     private DistributionParams distributionConstructorParams;
 
@@ -102,12 +101,12 @@ public class SimulationTabPageController{
     
     public String getBucketSize(){
         if(bucketSmall.isSelected())
-            return "0.02";
+            return Parameter.Size.SMALL.name();
         else if(bucketMedium.isSelected())
-            return "0.2";
+            return Parameter.Size.MEDIUM.name();
         else if(bucketSmall.isSelected())
-            return "1.0";
-        return "0"; //auto
+            return Parameter.Size.LARGE.name();
+        return ""; //auto
     }
 
     @FXML
@@ -173,7 +172,6 @@ public class SimulationTabPageController{
         bucketAuto.setSelected(true);
 
         deltaTemperature.setText("0");
-//        flexibility.setText("0");
     }
 
     private static class TextAreaOutputStream extends OutputStream {
