@@ -53,11 +53,11 @@ public class UIAgent extends Agent implements InterfaceUI{
                 }
                 msg = receive(stopAck);
                 if(msg != null){
-                    
+                    simulationTabPageController.printToConsole("Simulation stoped.");
                 }
                 msg = receive(pauseAck);
                 if(msg != null){
-                    
+                    simulationTabPageController.printToConsole("Simulation paused.");
                 }
                 msg = receive(done);
                 if(msg != null){
@@ -216,11 +216,17 @@ public class UIAgent extends Agent implements InterfaceUI{
     }
     
     private void sendStopSimReq(){
-        System.out.println("Sending Stop request..");
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        msg.addReceiver((AID)args[1]);
+        msg.setContent("STOP");
+        send(msg);
     }
     
     private void sendPauseSimReq(){
-        System.out.println("Sending Pause request..");
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        msg.addReceiver((AID)args[1]);
+        msg.setContent("PAUSE");
+        send(msg);
     }
     
     private void sendReqForData(Long id){

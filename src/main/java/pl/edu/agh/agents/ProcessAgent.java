@@ -118,6 +118,7 @@ public class ProcessAgent extends Agent {
                     msg.addReceiver((AID)args[0]);
                     msg.setContent("SIMULATION DONE");
                     myAgent.send(msg);
+                    stop = false;
                     
                     return true;
                 }
