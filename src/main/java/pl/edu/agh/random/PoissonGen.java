@@ -14,7 +14,9 @@ public class PoissonGen implements IDistGenerator {
     }
 
     public PoissonGen(Double mean) { //zostanie skonwertowana do liczby z zakresu 0.0 - 1.0
-        mean = mean < 0 ? 0.0 : createMean(mean, 10);
+        if( mean < 0)
+            mean = Math.abs(mean);
+        this.mean = mean > 1 ? createMean(mean, 10) : mean;
     }
 
     private Double createMean(Double value, int dim) {

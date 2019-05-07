@@ -61,7 +61,6 @@ public class SimulationTabPageController{
     public Button runButton;
     public Button learnButton;
 
-
     private DistributionParams distributionConstructorParams;
 
     @FXML
@@ -195,9 +194,6 @@ public class SimulationTabPageController{
     }
 
     public void printToConsole(String msg){
-        Runnable appendTask = () -> {
-            textAreaConsole.appendText("\n" + msg);
-        };
-        Platform.runLater(appendTask);
+        textAreaConsole.appendText("\n" + msg);
     }
 }

@@ -8,33 +8,38 @@ public class GeneratorRange {
     private Double stiffnessRange = 0.0;
     private Double volumeRange = 0.0;
     private Double massRange = 0.0;
+    private Double percentage;
 
     public Double getTemperatureRange() {
-        return temperatureRange;
+        return percentage != null ? temperatureRange * percentage : temperatureRange;
     }
 
     public Double getFlexibilityRange() {
-        return flexibilityRange;
+        return percentage != null ? flexibilityRange * percentage : flexibilityRange;
     }
 
     public Double getSurfaceRange() {
-        return surfaceRange;
+        return percentage != null ? surfaceRange * percentage : surfaceRange;
     }
 
     public Double getAmountRange() {
-        return amountRange;
+        return percentage != null ? amountRange * percentage : amountRange;
     }
 
     public Double getStiffnessRange() {
-        return stiffnessRange;
+        return percentage != null ? stiffnessRange * percentage : stiffnessRange;
     }
 
     public Double getVolumeRange() {
-        return volumeRange;
+        return percentage != null ? volumeRange * percentage : volumeRange;
     }
 
     public Double getMassRange() {
-        return massRange;
+        return percentage != null ? massRange * percentage : massRange;
+    }
+
+    public Double getPercentage() {
+        return percentage;
     }
 
     private GeneratorRange() {
@@ -79,6 +84,11 @@ public class GeneratorRange {
 
         public Builder flexibility(Double value) {
             result.flexibilityRange = value;
+            return this;
+        }
+        
+        public Builder percentage(Double value) {
+            result.percentage = value;
             return this;
         }
 

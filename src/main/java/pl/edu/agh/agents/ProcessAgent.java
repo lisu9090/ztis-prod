@@ -88,16 +88,22 @@ public class ProcessAgent extends Agent {
                     //do poprawienia
                 }
                 
-                ProductionProcess result = runProcess();
-                processesJsonList.add(result.paramsToJson());
                 ACLMessage processResult = new ACLMessage(ACLMessage.INFORM);
                 processResult.addReceiver((AID)args[0]);
-                try{
-                    processResult.setContent("Simulation no: " + step + " - " + result.computeWJP().toString());
-                }
-                catch(Exception e){
+                ProductionProcess result = runProcess();                  
+                if(result != null){
+                    processesJsonList.add(result.paramsToJson());
+                    try{
+                        processResult.setContent("Simulation no: " + step + " - " + result.computeWJP().toString());
+                    }
+                    catch(Exception e){
                      processResult.setContent("Failure: " + e);
+                    }
                 }
+                else{
+                    processResult.setContent("Process failed");
+                }
+
                 send(processResult);
                 step++;
             }
@@ -130,6 +136,7 @@ public class ProcessAgent extends Agent {
     private ProductionProcess runProcess(){
         ProductionProcess process = new ProductionProcess(prodModel.targetMaxTemp, prodModel.targetFlex, prodModel.targetSurface);
         process.setGenerator(prodModel.generator);
+        
         try{
             if(prodModel.inputTemperature == null || prodModel.inputVolume == null || prodModel.inputMass == null){
                 JSONObject content = process.paramsToJson();

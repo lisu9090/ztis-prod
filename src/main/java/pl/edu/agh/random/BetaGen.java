@@ -11,8 +11,16 @@ public class BetaGen implements IDistGenerator {
     }
 
     public BetaGen(Double alpha, Double beta) {
-        this.alpha = alpha;
-        this.beta = beta;
+        if(alpha < 0){
+            this.alpha = Math.abs(alpha);
+        }
+        else
+            this.alpha = alpha;
+        if(beta < 0){
+            this.beta = Math.abs(beta);
+        }
+        else
+            this.beta = beta;
     }
 
     @Override

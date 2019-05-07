@@ -28,7 +28,7 @@ public class ProductionProcess {
     private Flexibility outputFlexibility = new Flexibility(0.0, 1000000.0);
 
     private Double size;
-    private GeneratorRange generatorRange = new GeneratorRange.Builder().build();
+    private GeneratorRange generatorRange;
 
     private IDistGenerator generator;
     private Long pid;
@@ -37,6 +37,7 @@ public class ProductionProcess {
     private boolean secondStepCopleated = false;
     private boolean thirdStepCopleated = false;
     
+    private Double percentage = 0.1;
     private JSONObject stateJson = new JSONObject();
 
     private ProductionProcess() {
@@ -114,7 +115,14 @@ public class ProductionProcess {
         if (generator == null) {
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
         }
-
+        
+        generatorRange = new GeneratorRange.Builder()
+                .percentage(percentage)
+                .temperature(temp)
+                .volume(vol)
+                .mass(mass)
+                .build();
+        
         temperature.setValue(generator.generate(temp, generatorRange.getTemperatureRange()));
         if (!temperature.isCorrectValue()) {
             throw new Exception("Temperature is out of range! Process hes been stopped.");
@@ -145,6 +153,12 @@ public class ProductionProcess {
 
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
+        
+        generatorRange = new GeneratorRange.Builder()
+            .percentage(percentage)
+            .temperature(temperature.getValue() - deltaTemp)
+            .stiffness(((mass.getValue() / volume.getValue()) / 8000.0) * (1 - (temperature.getValue() / 2000.0)))
+            .build();
 
         temperature.setValue(generator.generate((temperature.getValue() - deltaTemp), generatorRange.getTemperatureRange()));
         if (!temperature.isCorrectValue())
@@ -174,6 +188,13 @@ public class ProductionProcess {
     public void thirdStep() throws Exception {
         if (generator == null)
             throw new Exception("Generator has not been initialized! Process hes been stopped.");
+        
+        generatorRange = new GeneratorRange.Builder()
+            .percentage(percentage)
+            .temperature((temperature.getValue() - 300))
+            .surface((amount.getValue() * (size / 0.002)))
+            .flexibility(stiffness.getValue() * temperature.getValue())
+            .build();
 
         temperature.setValue(generator.generate((temperature.getValue() - 300), generatorRange.getTemperatureRange()));
         if (!temperature.isCorrectValue())
