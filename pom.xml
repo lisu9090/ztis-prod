@@ -50,6 +50,26 @@
         <version>20180813</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
+    <dependency>
+        <groupId>nz.ac.waikato.cms.weka</groupId>
+        <artifactId>weka-stable</artifactId>
+        <version>3.8.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.tilab.jade</groupId>
+        <artifactId>jade</artifactId>
+        <version>4.5.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.jenetics/jenetics -->
+    <dependency>
+        <groupId>io.jenetics</groupId>
+        <artifactId>jenetics</artifactId>
+        <version>4.4.0</version>
+    </dependency>
+
+
     <!--This dependency is no longer in repository. You need to install it manually from http://jade.tilab.com/-->
 <!--    <dependency>
         <groupId>com.tilab.jade</groupId>

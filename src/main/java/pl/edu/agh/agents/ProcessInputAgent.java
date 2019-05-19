@@ -2,6 +2,8 @@ package pl.edu.agh.agents;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.json.JSONObject;
+import pl.edu.agh.GeneticOptimization;
+import pl.edu.agh.Observation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,10 +12,19 @@ public class ProcessInputAgent extends MLAgent {
     private double best_temp = 1900;
     private double best_mass = 1600;
     private double best_volume = 2;
+    private double min_wjp = Double.MAX_VALUE;
     private JSONObject recieved;
-    private double regressionParameters[];
 
     private ArrayList<Observation> observations = new ArrayList<>();
+    double[] regressionParameters;
+
+    private void setBest(double temp, double volume, double mass){
+        this.best_temp = temp;
+        this.best_volume = volume;
+        this.best_mass = mass;
+
+    }
+
     @Override
     protected void loadRecentConfig() {
 
@@ -25,6 +36,15 @@ public class ProcessInputAgent extends MLAgent {
         parseDataAndFindCurrentBest(recieved);
         System.out.println("Learned: mass "+best_mass+" volume: "+best_volume+" temp: "+best_temp);
         learnRegession();
+        GeneticOptimization optimization = new GeneticOptimization();
+        optimization.setFitnessParams(regressionParameters);
+        Observation o = optimization.runGeneticAlgorithm();
+        if(o.wjp < min_wjp){
+            min_wjp = o.wjp;
+            setBest(o.in_temperature, o.in_volume, o.in_mass);
+            System.out.println("Saving: " + o);
+        }
+
     }
 
     private void learnRegession(){
@@ -40,24 +60,19 @@ public class ProcessInputAgent extends MLAgent {
 
         OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
         regression.newSampleData(y, x);
+        regressionParameters = regression.estimateRegressionParameters();
 
-        double[] regressionParameters = regression.estimateRegressionParameters();
     }
 
 
     private void parseDataAndFindCurrentBest(JSONObject jsonObject){
         Iterator<String> keys = jsonObject.keys();
 
-        double min_wjp = Double.MAX_VALUE;
         while(keys.hasNext()) {
             String key = keys.next();
             if (jsonObject.get(key) instanceof JSONObject) {
-                // do something with jsonObject here
-                System.out.println(key);
-                System.out.println(jsonObject.get(key));
                 JSONObject one = (JSONObject) jsonObject.get(key);
-                System.out.println(one);
-                System.out.println(one.get("wjp"));
+
                 double wjp = Double.parseDouble((String)one.get("wjp"));
                 JSONObject stage_1 = (JSONObject) one.get("stage_1");
                 try {
@@ -75,8 +90,7 @@ public class ProcessInputAgent extends MLAgent {
                     e.printStackTrace();
                 }
             }
-        }
-        System.out.println(min_wjp);
+        };
     }
 
     @Override
@@ -84,8 +98,8 @@ public class ProcessInputAgent extends MLAgent {
         //dostaję wynik w stringu
         JSONObject jsonObject = new JSONObject(data);
         recieved = jsonObject;
-        System.out.println(jsonObject);
-        //zapisać dane w tablicy i potem odczytać w learn
+//        System.out.println(jsonObject);
+
 
     }
 
@@ -107,17 +121,3 @@ public class ProcessInputAgent extends MLAgent {
     
 }
 
-class Observation{
-    public double in_temperature;
-    public double in_volume;
-    public double in_mass;
-    public double wjp;
-
-    Observation(double in_temperature,double in_volume, double in_mass, double wjp){
-        this.in_temperature = in_temperature;
-        this.in_volume = in_volume;
-        this.in_mass = in_mass;
-        this.wjp = wjp;
-    }
-
-}
