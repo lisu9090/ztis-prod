@@ -8,7 +8,6 @@ package pl.edu.agh.agents;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import org.json.JSONObject;
@@ -76,14 +75,14 @@ public abstract class MLAgent extends Agent{
         });
     }
     
-    private void sendRequestForData(Long id){
+    protected void sendRequestForData(Long id){
         ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
         req.addReceiver((AID)args[2]);
         req.setContent(id != null ? id.toString() : "ALL");
         send(req);
     }
     
-    private void blockingSendReceiveForData(Long id){
+    protected void blockingSendReceiveForData(Long id){
         sendRequestForData(id);
         MessageTemplate dataResTemplate =  MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchSender((AID)args[2]));
         ACLMessage dataResponse = blockingReceive(dataResTemplate);
@@ -101,7 +100,7 @@ public abstract class MLAgent extends Agent{
     
     protected abstract void receiveData(String data);
     
-    protected abstract void learn();
+    protected abstract void learn(); //TODO
     
     protected abstract void loadRecentConfig();
 }
